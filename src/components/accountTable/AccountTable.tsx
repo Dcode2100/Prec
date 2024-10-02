@@ -46,7 +46,7 @@ const stylingKeys = {
 interface column<T> {
   header: string
   accessorKey: keyof T
-  cell?: (value: any, row: T) => React.ReactNode
+  cell?: (value: T[keyof T], row: T) => React.ReactNode
   sortable?: boolean
 }
 
@@ -110,18 +110,10 @@ export function AccountTable<T extends object>({
     onSearch?.(e.target.value)
   }
 
-  const handleRowClick = (row: T) => {
+  const onrowClick = (row: T) => {
     if (onRowClick) {
       onRowClick(row)
-    } else if ('account_id' in row) {
-      const accountType =
-        (row as any).type === 'Broking'
-          ? 'BK'
-          : (row as any).type === 'MF'
-          ? 'MF'
-          : 'PE'
-      router.push(`/accounts/${accountType}-${(row as any).account_id}`)
-    }
+    } 
   }
 
   const handleSort = (key: keyof T) => {
@@ -157,7 +149,7 @@ export function AccountTable<T extends object>({
     })
   }
 
-  const getItemColor = (value: any, header: string): string => {
+  const getItemColor = (value: T[keyof T], header: string): string => {
     if (typeof value !== 'string') return ''
     const lowerValue = value.toLowerCase()
     if (['completed', 'success',"complete"].includes(lowerValue)) return 'text-green-500'
@@ -324,14 +316,14 @@ export function AccountTable<T extends object>({
               sortedData.map((row, rowIndex) => (
                 <TableRow
                   key={rowIndex}
-                  onClick={() => handleRowClick(row)}
+                  onClick={() => onrowClick(row)}
                   className="cursor-pointer hover:bg-muted/50"
                 >
                   {columns.map((column, colIndex) => (
                     <TableCell
                       key={column.accessorKey as string}
                       className={cn(
-                        getItemColor(row[column.accessorKey] as string, column.header),
+                        getItemColor(row[column.accessorKey], column.header),
                         'relative pr-8' // Added right padding for copy icon
                       )}
                       style={{ width: columnWidths[column.accessorKey as keyof typeof columnWidths] }}

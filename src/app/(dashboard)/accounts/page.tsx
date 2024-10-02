@@ -42,7 +42,7 @@ const AccountsPage = () => {
   const { toast } = useToast()
 
   const [statusFilter, setStatusFilter] = useState('All')
-  const [exportData, setExportData] = useState<any[]>([])
+  const [exportData, setExportData] = useState<AccountResponse[]>([])
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
 
@@ -115,7 +115,7 @@ const AccountsPage = () => {
 
   useEffect(() => {
     setExportData(
-      accounts.map((row: any) => ({
+      accounts.map((row: AccountResponse) => ({
         ...row,
         created_at: moment(row?.created_at).format('YYYY-MM-DD HH:mm:ss'),
         evaluation_expiry_date: moment(row?.evaluation_expiry_date).format(
@@ -136,18 +136,14 @@ const AccountsPage = () => {
     onPageChange(1) // Reset to first page when changing tabs
     setStatusFilter(status)
   }
+  interface column<T> {
+    header: string
+    accessorKey: keyof T
+    cell?: (value: any, row: T) => React.ReactNode
+    sortable?: boolean
+  }
 
-  const columns = isAffiliate
-    ? [
-        { header: 'Account ID', accessorKey: 'gui_account_id' ,sortable: true},
-        { header: 'Name', accessorKey: 'first_name' ,sortable: true},
-        { header: 'Mobile', accessorKey: 'mobile' },
-        { header: 'Email', accessorKey: 'email' },
-        { header: 'Tracker', accessorKey: 'onboarding_tracker' ,sortable: true},
-        { header: 'Status', accessorKey: 'status' ,sortable: true},
-        { header: 'Created At', accessorKey: 'created_at' ,sortable: true},
-      ]
-    : [
+  const columns :column<AccountResponse>[] = [
         { header: 'Account ID', accessorKey: 'gui_account_id' },
         { header: 'Name', accessorKey: 'first_name' ,sortable: true},
         { header: 'Mobile', accessorKey: 'mobile'},
@@ -268,7 +264,7 @@ const AccountsPage = () => {
             isLoading={isLoading || isFetching}
             onRowClick={(row) => {
               const accountType =
-                row.type === 'Broking' ? 'BK' : row.type === 'MF' ? 'MF' : 'PE'
+                row.type === 'PE'
               router.push(`/accounts/${accountType}-${row.account_id}`)
             }}
             isSearchable={true}
