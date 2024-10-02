@@ -37,21 +37,10 @@ import Loader from '../Loader'
 import { SearchIcon, CheckIcon, XIcon, ClockIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import { CaretSortIcon, Cross2Icon } from '@radix-ui/react-icons'
-const stylingKeys = {
-  success: ['active', 'completed', 'approved'],
-  warning: ['pending', 'in progress'],
-  failed: ['failed', 'rejected', 'error'],
-}
-
-interface column<T> {
-  header: string
-  accessorKey: keyof T
-  cell?: (value: T[keyof T], row: T) => React.ReactNode
-  sortable?: boolean
-}
+import { ColumnTable } from '@/lib/types'
 
 interface DataTableProps<T> {
-  columns: column<T>[]
+  columns: ColumnTable<T>[]
   data: T[]
   totalItems: number
   itemsPerPage: number

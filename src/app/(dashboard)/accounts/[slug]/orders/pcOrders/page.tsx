@@ -31,6 +31,8 @@ import { DateRangePicker } from '@/components/DateRangePicker'
 import { OrdersParams } from '@/lib/types/types'
 import { DateRange } from 'react-day-picker'
 import PCOrderDetails from '@/components/sheets/PCOrderDetails'
+import { PCOrders } from '@/lib/types/PcEnquiryType'
+import { ColumnTable } from '@/lib/types'
 
 const headers = [
   { label: 'Order ID', key: 'gui_id' },
@@ -105,7 +107,7 @@ const PCOrdersTable = (): React.ReactElement => {
   const orders = data?.orders || []
   const totalItems = data?.total || 0
 
-  const columns = [
+  const columns : ColumnTable<PCOrders>[] = [
     { header: 'Order ID', accessorKey: 'gui_id' },
     { header: 'Account ID', accessorKey: 'gui_account_id' },
     { header: 'Symbol', accessorKey: 'symbol' },

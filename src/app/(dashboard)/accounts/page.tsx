@@ -35,6 +35,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { ColumnTable } from '@/lib/types'
 
 const AccountsPage = () => {
   const [selectedTab, setSelectedTab] = useState('all')
@@ -143,7 +144,7 @@ const AccountsPage = () => {
     sortable?: boolean
   }
 
-  const columns :column<AccountResponse>[] = [
+  const columns :ColumnTable<AccountResponse>[] = [
         { header: 'Account ID', accessorKey: 'gui_account_id' },
         { header: 'Name', accessorKey: 'first_name' ,sortable: true},
         { header: 'Mobile', accessorKey: 'mobile'},

@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { AccountTable } from '@/components/accountTable/AccountTable'
 import { FilterDrawer } from '@/components/accountTable/FilterDrawer'
 import { FilterSelect } from '@/components/accountTable/FilterSelect'
-import { FilterDateSelect } from '@/components/accountTable/FilterDateSelect'
 import { FilterRadioButtons } from '@/components/accountTable/FilterRadioButtons'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
@@ -338,10 +337,10 @@ const WalletTable = (): React.ReactElement => {
           value={dateFilterType}
           setValue={setDateFilterType}
         />
-        <FilterDateSelect
+        {/* <FilterDateSelect
           header=""
           onDateSelect={(st, ed) => setSelectedDates([st, ed])}
-        />
+        /> */}
       </FilterDrawer>
 
       <AccountWalletTransactionDetails

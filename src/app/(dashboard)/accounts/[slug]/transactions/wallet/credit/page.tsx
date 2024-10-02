@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { AccountTable } from '@/components/accountTable/AccountTable'
+import { AccountTable } from '@/components/AccountTable'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CSVLink } from 'react-csv'

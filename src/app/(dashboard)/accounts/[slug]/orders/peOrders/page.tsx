@@ -2,11 +2,10 @@
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
-import moment, { Moment } from 'moment'
+import moment from 'moment'
 import { AccountTable } from '@/components/accountTable/AccountTable'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import format from 'moment'
 import {
   Select,
   SelectContent,
@@ -16,9 +15,8 @@ import {
 } from '@/components/ui/select'
 // import { OrderDetails } from '@/components/OrderDetails';
 import { useToast } from '@/hooks/use-toast'
-import { getOrders, getOrdersByAccountId } from '@/lib/api/ordersApi'
+import {getOrdersByAccountId } from '@/lib/api/ordersApi'
 import { CSVLink } from 'react-csv'
-import { SearchIcon } from 'lucide-react'
 import { getGlobalItem } from '@/utils/utils'
 import {
   Sheet,
@@ -33,10 +31,10 @@ import { FilterIcon } from 'lucide-react'
 import { Slider } from '@/components/ui/slider'
 import { Label } from '@/components/ui/label'
 import { DateRangePicker } from '@/components/DateRangePicker'
-import { Account, OrdersParams } from '@/lib/types/types'
+import { OrderResponse, OrdersParams } from '@/lib/types/types'
 import { DateRange } from 'react-day-picker'
 import { cn } from '@/lib/utils'
-import { string, symbol } from 'zod'
+import { ColumnTable } from '@/lib/types'
 
 const segmentMap: Record<string, number> = {
   equity: 1,
@@ -145,7 +143,7 @@ const PeBuyOrdersTable = (): React.ReactElement => {
         INVALID: 'Invalid',
       }
 
-  const columns = [
+  const columns : ColumnTable<OrderResponse>[] = [
     { header: 'Order ID', accessorKey: 'gui_order_id' },
     { header: 'Account ID', accessorKey: 'gui_account_id' },
     { header: 'Side', accessorKey: 'side' },
@@ -163,7 +161,7 @@ const PeBuyOrdersTable = (): React.ReactElement => {
     {
       header: 'Created At',
       accessorKey: 'created_at',
-      cell: (value: string) => moment(value).format('YYYY-MM-DD HH:mm:ss'),
+      cell: ({getValue}) => moment(getValue() as string).format('YYYY-MM-DD HH:mm:ss'),
     },
   ]
 

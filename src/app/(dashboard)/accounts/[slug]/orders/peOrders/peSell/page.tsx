@@ -29,9 +29,10 @@ import { FilterIcon } from 'lucide-react'
 import { Slider } from '@/components/ui/slider'
 import { Label } from '@/components/ui/label'
 import { DateRangePicker } from '@/components/DateRangePicker'
-import { OrdersParams } from '@/lib/types/types'
+import { OrderResponse, OrdersParams } from '@/lib/types/types'
 import { DateRange } from 'react-day-picker'
 import { cn } from '@/lib/utils'
+import { ColumnTable } from '@/lib/types'
 
 const headers = [
   { label: 'Order ID', key: 'gui_order_id' },
@@ -115,7 +116,7 @@ const SellOrdersTable = (): React.ReactElement => {
     SUCCESS: 'Completed',
   }
 
-  const columns = [
+  const columns : ColumnTable<OrderResponse>[] = [
     { header: 'Order ID', accessorKey: 'gui_order_id' },
     { header: 'Account ID', accessorKey: 'gui_account_id' },
     { header: 'Side', accessorKey: 'side' },

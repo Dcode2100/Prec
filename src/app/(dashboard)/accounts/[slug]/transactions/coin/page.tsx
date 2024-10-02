@@ -19,6 +19,35 @@ import { capitalize } from '@/lib/globals/utils'
 import { getGlobalItem } from '@/utils/utils'
 import { Pe } from '@/lib/types/walletType'
 import { ColumnDef } from '@tanstack/react-table'
+import { ColumnTable } from '@/lib/types'
+
+// Define a type that represents the intersection of Pe and CoinTransactionResponse
+type PeWithCoinTransactionFields = Pe & Partial<CoinTransactionResponse>;
+
+function mapPeToCoinTransactionResponse(pe: PeWithCoinTransactionFields): CoinTransactionResponse {
+  return {
+    transaction_id: pe.gui_account_id || '',
+    gui_transaction_id: pe.gui_transaction_id || '',
+    gui_account_id: pe.gui_account_id || '',
+    referee_account_id: pe.referee_account_id || '',
+    direction: pe.direction || 'CREDIT',
+    coins: pe.coins || 0,
+    reward_type: pe.reward_type || '',
+    status: pe.status || 'PENDING',
+    description: pe.description || '',
+    created_at: pe.created_at || '',
+    updated_at: pe.updated_at || '',
+    mobile: pe.mobile || '',
+    first_name: pe.first_name || '',
+    last_name: pe.last_name || '',
+    email: pe.email || '',
+    account_id: pe.account_id || '',
+    referrer_account_id: pe.referrer_account_id || '',
+    referee_order_id: pe.referee_order_id || '',
+    order_id: pe.order_id || '',
+    note: pe.note || '',
+  };
+}
 
 type ColumnDefinition<T> = {
   header: string
@@ -68,10 +97,10 @@ const CoinTransactionTable = ({
     },
   })
 
-  const transactions = data?.PE || []
+  const transactions: CoinTransactionResponse[] = (data?.PE || []).map(mapPeToCoinTransactionResponse)
   const totalItems = data?.total || 0
 
-  const columns: ColumnDefinition<CoinTransactionResponse>[] = [
+  const columns: ColumnTable<CoinTransactionResponse>[] = [
     { header: 'Transaction ID', accessorKey: 'gui_transaction_id' },
     { header: 'Account ID', accessorKey: 'gui_account_id' },
     { header: 'Direction', accessorKey: 'direction' },
@@ -143,7 +172,7 @@ const CoinTransactionTable = ({
         </div>
         <TabsContent value="all">
           <AccountTable
-            columns={columns as ColumnDef<Pe>[]}
+            columns={columns }
             data={transactions}
             totalItems={totalItems}
             itemsPerPage={limit}
@@ -156,7 +185,7 @@ const CoinTransactionTable = ({
         </TabsContent>
         <TabsContent value="credit">
           <AccountTable
-            columns={columns as ColumnDef<Pe>[]}
+            columns={columns}
             data={transactions}
             totalItems={totalItems}
             itemsPerPage={limit}
@@ -169,7 +198,7 @@ const CoinTransactionTable = ({
         </TabsContent>
         <TabsContent value="debit">
           <AccountTable
-            columns={columns as ColumnDef<Pe>[]}
+            columns={columns}
             data={transactions}
             totalItems={totalItems}
             itemsPerPage={limit}

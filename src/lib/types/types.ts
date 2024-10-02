@@ -971,6 +971,7 @@ export interface OrderResponse {
   note?: string
   gst?: string
   documentation_charges?: string
+  price_per_lot?: string
 }
 
 export interface TokenResponse {

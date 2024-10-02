@@ -38,3 +38,10 @@ export type MainNavItem = NavItemWithOptionalChildren;
 
 export type SidebarNavItem = NavItemWithChildren;
 
+
+export interface ColumnTable<T> {
+  header: string
+  accessorKey: keyof T
+  cell?: (value: any, row: T) => React.ReactNode
+  sortable?: boolean
+}
