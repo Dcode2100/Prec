@@ -42,7 +42,7 @@ const AccountsPage = () => {
   const { toast } = useToast()
 
   const [statusFilter, setStatusFilter] = useState('All')
-  const [exportData, setExportData] = useState<AccountResponse[]>([])
+  const [exportData, setExportData] = useState<any[]>([])
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
 
@@ -115,7 +115,7 @@ const AccountsPage = () => {
 
   useEffect(() => {
     setExportData(
-      accounts.map((row: AccountResponse) => ({
+      accounts.map((row: any) => ({
         ...row,
         created_at: moment(row?.created_at).format('YYYY-MM-DD HH:mm:ss'),
         evaluation_expiry_date: moment(row?.evaluation_expiry_date).format(
@@ -264,7 +264,7 @@ const AccountsPage = () => {
             isLoading={isLoading || isFetching}
             onRowClick={(row) => {
               const accountType =
-                row.type === 'PE'
+                row.type === 'Broking' ? 'BK' : row.type === 'MF' ? 'MF' : 'PE'
               router.push(`/accounts/${accountType}-${row.account_id}`)
             }}
             isSearchable={true}
