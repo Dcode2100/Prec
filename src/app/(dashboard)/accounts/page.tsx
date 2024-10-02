@@ -139,24 +139,24 @@ const AccountsPage = () => {
 
   const columns = isAffiliate
     ? [
-        { header: 'Account ID', accessorKey: 'gui_account_id',isFilterable: true },
-        { header: 'Name', accessorKey: 'first_name' },
+        { header: 'Account ID', accessorKey: 'gui_account_id' ,sortable: true},
+        { header: 'Name', accessorKey: 'first_name' ,sortable: true},
         { header: 'Mobile', accessorKey: 'mobile' },
         { header: 'Email', accessorKey: 'email' },
-        { header: 'Tracker', accessorKey: 'onboarding_tracker' },
-        { header: 'Status', accessorKey: 'status' },
-        { header: 'Created At', accessorKey: 'created_at' },
+        { header: 'Tracker', accessorKey: 'onboarding_tracker' ,sortable: true},
+        { header: 'Status', accessorKey: 'status' ,sortable: true},
+        { header: 'Created At', accessorKey: 'created_at' ,sortable: true},
       ]
     : [
         { header: 'Account ID', accessorKey: 'gui_account_id' },
-        { header: 'Name', accessorKey: 'first_name' },
-        { header: 'Mobile', accessorKey: 'mobile' },
+        { header: 'Name', accessorKey: 'first_name' ,sortable: true},
+        { header: 'Mobile', accessorKey: 'mobile'},
         { header: 'Email', accessorKey: 'email' },
-        { header: 'Balance', accessorKey: 'wallet_balance' },
-        { header: 'Withdraw', accessorKey: 'withdraw_balance' },
-        { header: 'Tracker', accessorKey: 'onboarding_tracker' },
-        { header: 'Status', accessorKey: 'status' },
-        { header: 'Created At', accessorKey: 'created_at' },
+        { header: 'Balance', accessorKey: 'wallet_balance' ,sortable: true},
+        { header: 'Withdraw', accessorKey: 'withdraw_balance' ,sortable: true},
+        { header: 'Tracker', accessorKey: 'onboarding_tracker' ,sortable: true},
+        { header: 'Status', accessorKey: 'status' ,sortable: true},
+        { header: 'Created At', accessorKey: 'created_at' ,sortable: true},
       ]
 
   const handleSearch = (value: string) => {

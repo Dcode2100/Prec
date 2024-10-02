@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   Table,
   TableBody,
@@ -43,7 +43,7 @@ const stylingKeys = {
   failed: ['failed', 'rejected', 'error'],
 }
 
-interface Column<T> {
+interface column<T> {
   header: string
   accessorKey: keyof T
   cell?: (value: any, row: T) => React.ReactNode
@@ -51,7 +51,7 @@ interface Column<T> {
 }
 
 interface DataTableProps<T> {
-  columns: Column<T>[]
+  columns: column<T>[]
   data: T[]
   totalItems: number
   itemsPerPage: number
@@ -89,11 +89,19 @@ export function AccountTable<T extends object>({
   const [searchValue, setSearchValue] = useState('')
   const [sorting, setSorting] = useState<{
     key: keyof T
-    direction: 'asc' | 'desc'
+    direction: 'asc' | 'desc' | null
   } | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
   const { toast } = useToast()
   const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null)
+
+  // Store the original data order
+  const [originalData, setOriginalData] = useState<T[]>([])
+
+  // Update originalData when the data prop changes
+  useEffect(() => {
+    setOriginalData(data)
+  }, [data])
 
   const totalPages = Math.ceil(totalItems / itemsPerPage)
 
@@ -118,17 +126,20 @@ export function AccountTable<T extends object>({
 
   const handleSort = (key: keyof T) => {
     if (sorting?.key === key) {
-      setSorting({
-        key,
-        direction: sorting.direction === 'asc' ? 'desc' : 'asc',
-      })
+      if (sorting.direction === 'asc') {
+        setSorting({ key, direction: 'desc' })
+      } else if (sorting.direction === 'desc') {
+        setSorting(null) // Remove sorting
+      } else {
+        setSorting({ key, direction: 'asc' })
+      }
     } else {
       setSorting({ key, direction: 'asc' })
     }
   }
 
   const sortedData = useMemo(() => {
-    if (!sorting) return data
+    if (!sorting) return originalData
     return [...data].sort((a, b) => {
       if (a[sorting.key] < b[sorting.key])
         return sorting.direction === 'asc' ? -1 : 1
@@ -136,7 +147,7 @@ export function AccountTable<T extends object>({
         return sorting.direction === 'asc' ? 1 : -1
       return 0
     })
-  }, [data, sorting])
+  }, [data, sorting, originalData])
 
   const copyToClipboard = (value: string) => {
     navigator.clipboard.writeText(value)
@@ -274,8 +285,10 @@ export function AccountTable<T extends object>({
                         {sorting?.key === column.accessorKey ? (
                           sorting.direction === 'asc' ? (
                             <ArrowUpIcon className="h-4 w-4" />
-                          ) : (
+                          ) : sorting.direction === 'desc' ? (
                             <ArrowDownIcon className="h-4 w-4" />
+                          ) : (
+                            <CaretSortIcon className="h-4 w-4" />
                           )
                         ) : (
                           <CaretSortIcon className="h-4 w-4" />
