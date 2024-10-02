@@ -204,6 +204,21 @@ export function AccountTable<T extends object>({
     )
   }
 
+  // Define column widths
+  const columnWidths = {
+    token: '150px',
+    symbol: '250px',
+    quantity: '100px',
+    price: '100px',
+    investment: '120px',
+    ltp: '100px',
+    pnl: '100px',
+    percentagePNL: '150px',
+    transferHolding: '150px',
+    updateHolding: '150px',
+    applyRightsIssue: '150px',
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -241,23 +256,22 @@ export function AccountTable<T extends object>({
         )}
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               {columns.map((column) => (
                 <TableHead
                   key={column.header}
-                  onClick={() =>
-                    column.sortable && handleSort(column.accessorKey)
-                  }
+                  onClick={() => column.sortable && handleSort(column.accessorKey)}
                   className={cn(
-                    'cursor-pointer',
+                    'cursor-pointer whitespace-nowrap',
                     column.sortable && 'hover:bg-muted'
                   )}
+                  style={{ width: columnWidths[column.accessorKey as keyof typeof columnWidths] }}
                 >
-                  <div className="flex items-center">
-                    {column.header}
+                  <div className="flex items-center justify-between">
+                    <span>{column.header}</span>
                     {column.sortable && (
                       <span className="ml-2">
                         {sorting?.key === column.accessorKey ? (
@@ -275,15 +289,27 @@ export function AccountTable<T extends object>({
                 </TableHead>
               ))}
               {(onDelete || onDownload || onClickSendEmail) && (
-                <TableHead>Actions</TableHead>
+                <TableHead className="whitespace-nowrap" style={{ width: '150px' }}>Actions</TableHead>
               )}
             </TableRow>
           </TableHeader>
-          <TableBody className="relative w-full">
+          <TableBody>
             {isLoading ? (
-              <div className="h-[calc(100vh-330px)] w-full">
-                <Loader />
-              </div>
+              <TableRow>
+                <TableCell colSpan={columns.length + (onDelete || onDownload || onClickSendEmail ? 1 : 0)}>
+                  <div className="h-[400px] w-full flex items-center justify-center">
+                    <Loader />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : sortedData.length === 0 ? (
+              <TableRow >
+                <TableCell colSpan={columns.length + (onDelete || onDownload || onClickSendEmail ? 1 : 0)}>
+                  <div className="min-h-[calc(100vh-350px)] relative w-full flex items-center justify-center">
+                    No data available
+                  </div>
+                </TableCell>
+              </TableRow>
             ) : (
               sortedData.map((row, rowIndex) => (
                 <TableRow
@@ -291,58 +317,57 @@ export function AccountTable<T extends object>({
                   onClick={() => handleRowClick(row)}
                   className="cursor-pointer hover:bg-muted/50"
                 >
-                  {columns.map((column, colIndex) => (
+                  {columns.map((column) => (
                     <TableCell
                       key={column.accessorKey as string}
                       className={cn(
-                        getItemColor(
-                          row[column.accessorKey] as string,
-                          column.header
-                        ),
+                        getItemColor(row[column.accessorKey] as string, column.header),
                         'relative'
                       )}
-                      onMouseEnter={() =>
-                        setHoveredCell({ row: rowIndex, col: colIndex })
-                      }
-                      onMouseLeave={() => setHoveredCell(null)}
+                      style={{ width: columnWidths[column.accessorKey as keyof typeof columnWidths] }}
                     >
-                      <div
-                        className="flex items-center relative"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          copyToClipboard(row[column.accessorKey] as string)
-                        }}
-                      >
-                        {column.header.toLowerCase() === 'created at' ? (
-                          formatDate(row[column.accessorKey] as string)
-                        ) : column.header.toLowerCase() === 'status' ? (
-                          renderStatus(row[column.accessorKey] as string)
-                        ) : column.header.toLowerCase() === 'type' &&
-                          ['Broking', 'MF', 'PE'].includes(
-                            row[column.accessorKey] as string
-                          ) ? (
-                          <Badge variant="outline">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="truncate">
+                              {column.header.toLowerCase() === 'created at' ? (
+                                formatDate(row[column.accessorKey] as string)
+                              ) : column.header.toLowerCase() === 'status' ? (
+                                renderStatus(row[column.accessorKey] as string)
+                              ) : column.header.toLowerCase() === 'type' &&
+                                ['Broking', 'MF', 'PE'].includes(
+                                  row[column.accessorKey] as string
+                                ) ? (
+                                <Badge variant="outline">
+                                  {row[column.accessorKey] as string}
+                                </Badge>
+                              ) : (
+                                column.cell?.(row[column.accessorKey], row) ??
+                                (row[column.accessorKey] as React.ReactNode)
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
                             {row[column.accessorKey] as string}
-                          </Badge>
-                        ) : (
-                          column.cell?.(row[column.accessorKey], row) ??
-                          (row[column.accessorKey] as React.ReactNode)
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      {hoveredCell?.row === rowIndex &&
+                        hoveredCell?.col === column.accessorKey && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <CopyIcon
+                                  className="ml-2 h-4 w-4 cursor-pointer"
+                                  onClick={(e) => copyToClipboard(row[column.accessorKey] as string)}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                Copy to clipboard
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         )}
-                        {hoveredCell?.row === rowIndex &&
-                          hoveredCell?.col === colIndex &&
-                          column.accessorKey in row && (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <CopyIcon className="ml-2 h-full w-3 absolute top-0 cursor-pointer" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  Copy to clipboard
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                      </div>
                     </TableCell>
                   ))}
                   {(onDelete || onDownload || onClickSendEmail) && (
@@ -433,7 +458,7 @@ export function AccountTable<T extends object>({
               <SelectValue placeholder={itemsPerPage} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 30, 60, 80].map((pageSize) => (
+              {[10, 20, 30, 60, totalItems].map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>

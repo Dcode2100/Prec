@@ -115,6 +115,8 @@ export enum AccountStatus {
   PENDING = 'PENDING',
   ACTIVE = 'ACTIVE',
   COMPLETE = 'COMPLETE',
+  PC_ACTIVE = "PC_ACTIVE",
+  PC_INACTIVE = "PC_INACTIVE"
 }
 
 export enum WaitStatus {

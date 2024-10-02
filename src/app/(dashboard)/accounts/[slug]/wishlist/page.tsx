@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { AccountTable } from '@/components/AccountTable'
+import { AccountTable } from '@/components/accountTable/AccountTable'
 import { ColumnDef } from '@tanstack/react-table'
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'

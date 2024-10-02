@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       </div>
       <div className="main-content h-full min-w-[calc(100%-72px)] flex items-center flex-col">
         <Header />
-        <main className="h-[calc(100vh-70px)] w-full pt-1 px-2 relative">
+        <main className="h-[calc(100vh-70px)] w-full pt-1 px-2 relative overflow-auto">
           {children}
         </main>
       </div>
