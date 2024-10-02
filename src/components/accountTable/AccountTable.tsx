@@ -91,12 +91,9 @@ export function AccountTable<T extends object>({
     key: keyof T
     direction: 'asc' | 'desc'
   } | null>(null)
-  const [hoveredCell, setHoveredCell] = useState<{
-    row: number
-    col: number
-  } | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
   const { toast } = useToast()
+  const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null)
 
   const totalPages = Math.ceil(totalItems / itemsPerPage)
 
@@ -317,14 +314,16 @@ export function AccountTable<T extends object>({
                   onClick={() => handleRowClick(row)}
                   className="cursor-pointer hover:bg-muted/50"
                 >
-                  {columns.map((column) => (
+                  {columns.map((column, colIndex) => (
                     <TableCell
                       key={column.accessorKey as string}
                       className={cn(
                         getItemColor(row[column.accessorKey] as string, column.header),
-                        'relative'
+                        'relative pr-8' // Added right padding for copy icon
                       )}
                       style={{ width: columnWidths[column.accessorKey as keyof typeof columnWidths] }}
+                      onMouseEnter={() => setHoveredCell({ row: rowIndex, col: colIndex })}
+                      onMouseLeave={() => setHoveredCell(null)}
                     >
                       <TooltipProvider>
                         <Tooltip>
@@ -352,22 +351,24 @@ export function AccountTable<T extends object>({
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                      {hoveredCell?.row === rowIndex &&
-                        hoveredCell?.col === column.accessorKey && (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <CopyIcon
-                                  className="ml-2 h-4 w-4 cursor-pointer"
-                                  onClick={(e) => copyToClipboard(row[column.accessorKey] as string)}
-                                />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                Copy to clipboard
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        )}
+                      {hoveredCell?.row === rowIndex && hoveredCell?.col === colIndex && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <CopyIcon
+                                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyToClipboard(row[column.accessorKey] as string);
+                                }}
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Copy to clipboard
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
                     </TableCell>
                   ))}
                   {(onDelete || onDownload || onClickSendEmail) && (
