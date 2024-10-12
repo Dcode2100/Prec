@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { DataTable } from '../components/table/data-table'
 
 import FilterDateSelect from '../components/filterDrawer'
-import { Moment } from 'moment'
+import moment, { Moment } from 'moment'
 import { Button } from '@/components/ui/button'
 import { ColumnDef } from '@tanstack/react-table'
 import { CSVLink } from 'react-csv'
@@ -13,8 +13,10 @@ import { columsForYetToStart } from '../components/table/columns'
 import { getAllPcHoldings } from '@/lib/api/holdingApi'
 import { PcHolding } from '@/lib/types/getAllPCHoldingsType'
 import { exportPcHoldingsEndedHeaders } from '@/constants/headers'
+import { useSearchParams } from 'next/navigation'
 
 const PEPendingOrders = () => {
+  const searchParams = useSearchParams()
   const [pagination, setPagination] = useState({
     common: { limit: 10, page: 1 },
   })
@@ -23,9 +25,13 @@ const PEPendingOrders = () => {
   const [dateFilter, setDateFilter] = useState<{
     startDate: Moment | null
     endDate: Moment | null
-  }>({
-    startDate: null,
-    endDate: null,
+  }>(() => {
+    const startDate = searchParams.get('startDate')
+    const endDate = searchParams.get('endDate')
+    return {
+      startDate: startDate ? moment(startDate) : null,
+      endDate: endDate ? moment(endDate) : null,
+    }
   })
 
   const fetchOrder = async () => {

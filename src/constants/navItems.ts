@@ -38,12 +38,12 @@ export const defaultAdminMenuItems = [
     category: [
       {
         name: 'Private Equity',
-        path: '/privateequity',
+        path: '/private-equity',
         icon: 'Users',
       },
       {
         name: 'Private Credit',
-        path: '/privatecredit',
+        path: '/private-credit',
         icon: 'Users',
       },
       {
@@ -96,17 +96,17 @@ export const defaultAdminMenuItems = [
     category: [
       {
         name: 'Buy',
-        path: '/orders',
+        path: '/orders/buy',
         icon: 'Transaction',
       },
       {
         name: 'Sell',
-        path: '/sell-orders',
+        path: '/orders/sell',
         icon: 'Transaction',
       },
       {
         name: 'PC Orders',
-        path: '/pc-orders',
+        path: '/orders/pc-orders',
         icon: 'Transaction',
       },
     ],
@@ -120,27 +120,27 @@ export const defaultAdminMenuItems = [
     category: [
       {
         name: 'Buy',
-        path: '/transactions',
+        path: '/transactions/buy',
         icon: 'Transaction',
       },
       {
         name: 'Wallet',
-        path: '/wallet-transactions',
+        path: '/transactions/wallet',
         icon: 'Transaction',
       },
       {
         name: 'BulkPe Transactions',
-        path: '/bulkPe-transactions',
+        path: '/transactions/bulkPe-transactions',
         icon: 'Transaction',
       },
       {
         name: 'Coin',
-        path: '/coin-transactions',
+        path: '/transactions/coin-transactions',
         icon: 'Transaction',
       },
       {
         name: 'PennyDrop',
-        path: '/pennydrop-transactions',
+        path: '/transactions/pennydrop-transactions',
         icon: 'Transaction',
       },
     ],
@@ -204,12 +204,12 @@ export const defaultAdminMenuItems = [
       },
       {
         name: 'SES Webhook',
-        path: '/ses_webhook',
+        path: '/ses-webhook',
         icon: 'Report',
       },
       {
         name: 'Interakt Webhook',
-        path: '/interakt_webhook',
+        path: '/interakt-webhook',
         icon: 'Report',
       },
       {

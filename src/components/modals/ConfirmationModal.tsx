@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
@@ -62,8 +62,7 @@ const ConfirmationModal = ({
       if (res?.data?.statusCode === 200) {
         toast({
           description: 'Holding Updated Successfully',
-          status: 'success',
-          isClosable: true,
+          variant: 'default',
         })
         handleModalClose()
       }

@@ -57,7 +57,7 @@ function UploadBulkAsset({ buttonText, refetch = () => {} }) {
       <div className="flexBox">
         <div className="upload-btn-wrapper">
           <Button
-            isLoading={isLoading}
+            isloading={isLoading}
             isDisabled={isLoading}
             loadingText="Uploading"
             onClick={handleButtonClick}

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Sheet,
   SheetContent,
@@ -7,16 +7,16 @@ import {
   SheetHeader,
   SheetTitle,
   SheetFooter,
-} from '@/components/ui/sheet';
+} from '@/components/ui/sheet'
 
 interface FilterDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onApply: () => void;
-  children: React.ReactNode;
+  isOpen: boolean
+  onClose: () => void
+  onApply: () => void
+  children: React.ReactNode
 }
 
-export const FilterDrawer: React.FC<FilterDrawerProps> = ({
+const FilterDrawer: React.FC<FilterDrawerProps> = ({
   isOpen,
   onClose,
   onApply,
@@ -31,11 +31,26 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
             Apply filters to refine your results.
           </SheetDescription>
         </SheetHeader>
-        <div className="py-4">{children}</div>
+        <div className="py-4 flex flex-col gap-4">{children}</div>
         <SheetFooter>
-          <Button onClick={onApply}>Apply Filters</Button>
+          <div className="flex justify-end mt-6">
+            <Button onClick={onClose} variant="outline" className="mr-2">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                onApply()
+                onClose()
+              }}
+            >
+              Apply Filters
+            </Button>
+          </div>
+
         </SheetFooter>
       </SheetContent>
     </Sheet>
-  );
-};
+  )
+}
+
+export default FilterDrawer

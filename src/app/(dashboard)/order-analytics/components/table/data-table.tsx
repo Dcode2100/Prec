@@ -23,6 +23,8 @@ import type {
   ColumnFiltersState,
 } from '@tanstack/react-table'
 import { DataTableToolbar } from './data-table-toolbar'
+import OrderDetails from '../OrderDetailsDrawer'
+import { PEOrderType } from '@/lib/types/types'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -57,10 +59,18 @@ export function DataTable<TData, TValue>({
   onChangeFilter,
   total,
   isLoading,
+  refetch,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [rowSelection, setRowSelection] = useState({})
+  const [selectedOrder, setSelectedOrder] = useState<PEOrderType | null>(null)
+
+  const handleRowClick = (order: PEOrderType) => {
+    if ('order_id' in order) {
+      setSelectedOrder(order as PEOrderType)
+    }
+  }
 
   const table = useReactTable({
     data,
@@ -125,7 +135,9 @@ export function DataTable<TData, TValue>({
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && 'selected'}
-                      onClick={() => {}}
+                      onClick={() =>
+                        handleRowClick(row.original as PEOrderType)
+                      }
                       className="cursor-pointer hover:bg-muted/50"
                     >
                       {row.getVisibleCells().map((cell) => (
@@ -161,6 +173,16 @@ export function DataTable<TData, TValue>({
         onRowChange={onRowChange}
         total={total}
       />
+      {selectedOrder && (
+        <OrderDetails
+          orderId={selectedOrder.order_id}
+          isOpen={!!selectedOrder}
+          onClose={() => {
+            setSelectedOrder(null)
+            refetch()
+          }}
+        />
+      )}
     </div>
   )
 }

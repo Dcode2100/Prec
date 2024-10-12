@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import moment from 'moment'
-import { AccountTable } from '@/components/accountTable/AccountTable'
+import AccountTable from '@/components/accountTable/AccountTable'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -14,8 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 // import { OrderDetails } from '@/components/OrderDetails';
-import { useToast } from '@/hooks/use-toast'
-import {getOrdersByAccountId } from '@/lib/api/ordersApi'
+import { getOrdersByAccountId } from '@/lib/api/ordersApi'
 import { CSVLink } from 'react-csv'
 import { getGlobalItem } from '@/utils/utils'
 import {
@@ -35,12 +34,6 @@ import { OrderResponse, OrdersParams } from '@/lib/types/types'
 import { DateRange } from 'react-day-picker'
 import { cn } from '@/lib/utils'
 import { ColumnTable } from '@/lib/types'
-
-const segmentMap: Record<string, number> = {
-  equity: 1,
-  currency: 2,
-  commodity: 3,
-}
 
 const headers = [
   { label: 'Order ID', key: 'gui_order_id' },
@@ -62,8 +55,6 @@ const PeBuyOrdersTable = (): React.ReactElement => {
   const accountId = parts.slice(1).join('-')
 
   const [selectedOrder, setSelectedOrder] = useState<string | undefined>()
-  const [filterOpen, setFilterOpen] = useState(false)
-  const [sideFilter, setSideFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('All')
   const [companyFilter, setCompanyFilter] = useState<string>('All')
   const [qtyFilterType, setQtyFilterType] = useState<string>('between')
@@ -75,13 +66,12 @@ const PeBuyOrdersTable = (): React.ReactElement => {
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(20)
   const [search, setSearch] = useState('')
-  const { toast } = useToast()
+
   const isAffiliate = getGlobalItem('isAffiliate')
 
-  // Add new state variables for temporary filter values
   const [tempStatusFilter, setTempStatusFilter] = useState<string>('All')
   const [tempCompanyFilter, setTempCompanyFilter] = useState<string>('All')
-  const [tempQtyFilterType, setTempQtyFilterType] = useState<string>('between')
+  const tempQtyFilterType = 'between'
   const [tempDateRange, setTempDateRange] = useState<DateRange | undefined>()
 
   const fetchOrders = async () => {
@@ -89,7 +79,6 @@ const PeBuyOrdersTable = (): React.ReactElement => {
       page,
       limit,
       type: 'PE',
-      side: sideFilter !== 'All' ? sideFilter : '',
       status: statusFilter !== 'All' ? statusFilter : undefined,
       search,
       qtyStart: qtyStart !== 0 ? qtyStart : undefined,
@@ -112,7 +101,6 @@ const PeBuyOrdersTable = (): React.ReactElement => {
       accountId,
       page,
       limit,
-      sideFilter,
       statusFilter,
       companyFilter,
       qtyStart,
@@ -183,7 +171,7 @@ const PeBuyOrdersTable = (): React.ReactElement => {
     refetch()
   }
 
-  const handleRowClick = (row: any) => {
+  const handleRowClick = (row: OrderResponse) => {
     setSelectedOrder(row.order_id)
   }
 
@@ -235,16 +223,6 @@ const PeBuyOrdersTable = (): React.ReactElement => {
     }
   }
 
-  const filterOptions = [
-    {
-      key: 'status',
-      options: ['All', ...Object.keys(peStatusOptions)],
-    },
-    {
-      key: 'company',
-      options: ['All', ...assetIdsOptions],
-    },
-  ]
 
   return (
     <>

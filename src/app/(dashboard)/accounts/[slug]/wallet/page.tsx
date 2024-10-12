@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
-import { AccountTable } from '@/components/accountTable/AccountTable'
+import AccountTable from '@/components/accountTable/AccountTable'
 import {
   createVirtualAccount,
   getWalletByAccountId,

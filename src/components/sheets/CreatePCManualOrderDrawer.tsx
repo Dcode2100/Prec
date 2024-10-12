@@ -1,14 +1,14 @@
 'use client'
 
-import React, { useEffect, useState } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { useToast } from "@/hooks/use-toast"
+import React, { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useToast } from '@/hooks/use-toast'
 import { Formik, Form, Field } from 'formik'
 import * as Yup from 'yup'
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 import {
   Select,
   SelectTrigger,
@@ -17,40 +17,39 @@ import {
   SelectGroup,
   SelectLabel,
   SelectItem,
-} from "@/components/ui/select"
+} from '@/components/ui/select'
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
-import { Separator } from "@/components/ui/separator"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { createManualOrderForPC, getAssetsForPC } from "@/lib/api/ordersApi"
-import { AssetsForPC } from "@/lib/types/types"
-import { convertDateToUTC } from "@/utils/helper"
-import moment from "moment"
+} from '@/components/ui/sheet'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { createManualOrderForPC, getAssetsForPC } from '@/lib/api/ordersApi'
+import { AssetsForPC } from '@/lib/types/types'
+import { convertDateToUTC } from '@/utils/helper'
+import moment from 'moment'
 import { DatePicker } from '@/components/DatePicker'
 
 const PCOrderStatus = {
-  SUBSCRIPTION_PROCESSING: "Processing",
-  SUBSCRIPTION_PROCESSED: "Processed",
+  SUBSCRIPTION_PROCESSING: 'Processing',
+  SUBSCRIPTION_PROCESSED: 'Processed',
 }
 
 const PCAssetsStatus = {
-  live: "Live",
-  coming_soon: "Coming soon",
-  ON_TIME: "On Time",
-  DELAYED: "Delayed",
-  ENDED: "Ended",
-  REPAID: "Repaid",
+  live: 'Live',
+  coming_soon: 'Coming soon',
+  ON_TIME: 'On Time',
+  DELAYED: 'Delayed',
+  ENDED: 'Ended',
+  REPAID: 'Repaid',
 }
 
 const PCAssetsState = {
-  ACTIVE: "Active",
-  INACTIVE: "In-active",
-  ALL: "All"
+  ACTIVE: 'Active',
+  INACTIVE: 'In-active',
+  ALL: 'All',
 }
 
 const validationSchema = Yup.object().shape({
@@ -77,7 +76,16 @@ const validationSchema = Yup.object().shape({
   subscription_processed_date: Yup.date().nullable(),
 })
 
-const InputField = ({ name, label, type = 'text', placeholder, errors, touched, disabled = false, className = '' }) => {
+const InputField = ({
+  name,
+  label,
+  type = 'text',
+  placeholder,
+  errors,
+  touched,
+  disabled = false,
+  className = '',
+}) => {
   return (
     <div className={`flex items-center justify-start gap-4 ${className}`}>
       <Label htmlFor={name} className="text-muted-foreground w-[150px]">
@@ -182,7 +190,6 @@ const DatePickerField = ({
   label,
   errors,
   touched,
-  disabled = false,
   className = '',
   showTime = false,
 }) => {
@@ -213,15 +220,20 @@ const DatePickerField = ({
   )
 }
 
-const CreatePCManualOrderModal = ({ isOpen, onClose, accountId, coinBalance }) => {
+const CreatePCManualOrderModal = ({
+  isOpen,
+  onClose,
+  accountId,
+  coinBalance,
+}) => {
   const { toast } = useToast()
-  const [filter, setFilter] = useState({ status: "LIVE", state: "ACTIVE" })
+  const [filter, setFilter] = useState({ status: 'LIVE', state: 'ACTIVE' })
   const [assets, setAssets] = useState<AssetsForPC[]>([])
 
   const initialValues = {
     user_id: accountId,
-    asset_id: "",
-    status: "SUBSCRIPTION_PROCESSING",
+    asset_id: '',
+    status: 'SUBSCRIPTION_PROCESSING',
     quantity: 1,
     price: 0,
     transaction_fee: 0,
@@ -233,7 +245,7 @@ const CreatePCManualOrderModal = ({ isOpen, onClose, accountId, coinBalance }) =
     order_created_date: null,
     subscription_confirmed_date: null,
     payment_date: null,
-    subscription_processed_date: null
+    subscription_processed_date: null,
   }
 
   const fetchAssets = async (filter) => {
@@ -241,7 +253,7 @@ const CreatePCManualOrderModal = ({ isOpen, onClose, accountId, coinBalance }) =
     return response.data.assets
   }
 
-  const { data: assetsData, isLoading, isError } = useQuery({
+  const { data: assetsData } = useQuery({
     queryKey: ['assets', filter],
     queryFn: () => fetchAssets(filter),
     staleTime: 0,
@@ -332,10 +344,15 @@ const CreatePCManualOrderModal = ({ isOpen, onClose, accountId, coinBalance }) =
                 touched={touched}
                 onChange={(value) => {
                   setFieldValue('asset_id', value)
-                  const selectedAsset = assets.find(asset => asset.id === value)
+                  const selectedAsset = assets.find(
+                    (asset) => asset.id === value
+                  )
                   if (selectedAsset) {
                     setFieldValue('price', selectedAsset.price)
-                    setFieldValue('transaction_fee', selectedAsset.transaction_fees)
+                    setFieldValue(
+                      'transaction_fee',
+                      selectedAsset.transaction_fees
+                    )
                     setFieldValue('gst', selectedAsset.gst)
                   }
                 }}
@@ -465,8 +482,7 @@ const CreatePCManualOrderModal = ({ isOpen, onClose, accountId, coinBalance }) =
                 touched={touched}
               />
 
-             
-{coinBalance > 0 && (
+              {coinBalance > 0 && (
                 <InputField
                   name="coins"
                   label="Coins"

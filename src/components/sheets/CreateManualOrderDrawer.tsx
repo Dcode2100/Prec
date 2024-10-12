@@ -32,9 +32,7 @@ import moment from 'moment'
 import { DatePicker } from '@/components/DatePicker'
 import { TokenResponse } from '@/lib/types/types'
 
-interface Token {
-  price: string
-}
+
 
 const validationSchema = Yup.object().shape({
   token: Yup.string().required('Token is required'),
@@ -165,7 +163,6 @@ const DatePickerField = ({
   label,
   errors,
   touched,
-  disabled = false,
   className = '',
   showTime = false,
 }) => {
@@ -230,8 +227,6 @@ const CreateManualOrderModal = ({ isOpen, onClose, accountId }) => {
 
   const {
     data: tokensData,
-    isLoading,
-    error,
   } = useQuery({
     queryKey: ['tokens'],
     queryFn: fetchTokens,

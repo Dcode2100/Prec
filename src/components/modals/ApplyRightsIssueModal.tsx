@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
@@ -50,7 +50,11 @@ const ApplyRightsIssueModal = ({
   const formOptions = { resolver: yupResolver(validationSchema) }
 
   const form = useForm(formOptions)
-  const { register, handleSubmit, reset, formState: { errors } } = form
+  const {
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = form
 
   const [orderCreatedDate, setOrderCreatedDate] = useState('')
   const [paymentDate, setPaymentDate] = useState('')
@@ -91,7 +95,10 @@ const ApplyRightsIssueModal = ({
   })
 
   return (
-    <Dialog open={openApplyRightsIssueModal} onOpenChange={setOpenApplyRightsIssueModal}>
+    <Dialog
+      open={openApplyRightsIssueModal}
+      onOpenChange={setOpenApplyRightsIssueModal}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Confirmation</DialogTitle>
@@ -146,7 +153,9 @@ const ApplyRightsIssueModal = ({
                       max={`${moment(new Date()).format('YYYY-MM-DDTHH:mm')}`}
                       onChange={(e) => {
                         setOrderCreatedDate(
-                          moment(new Date(e.target.value)).toISOString().split('.')[0] + 'Z'
+                          moment(new Date(e.target.value))
+                            .toISOString()
+                            .split('.')[0] + 'Z'
                         )
                         field.onChange(e)
                       }}
@@ -169,7 +178,9 @@ const ApplyRightsIssueModal = ({
                       max={`${moment(new Date()).format('YYYY-MM-DDTHH:mm')}`}
                       onChange={(e) => {
                         setPaymentDate(
-                          moment(new Date(e.target.value)).toISOString().split('.')[0] + 'Z'
+                          moment(new Date(e.target.value))
+                            .toISOString()
+                            .split('.')[0] + 'Z'
                         )
                         field.onChange(e)
                       }}
@@ -192,7 +203,9 @@ const ApplyRightsIssueModal = ({
                       max={`${moment(new Date()).format('YYYY-MM-DDTHH:mm')}`}
                       onChange={(e) => {
                         setSharesTransferredDate(
-                          moment(new Date(e.target.value)).toISOString().split('.')[0] + 'Z'
+                          moment(new Date(e.target.value))
+                            .toISOString()
+                            .split('.')[0] + 'Z'
                         )
                         field.onChange(e)
                       }}

@@ -31,9 +31,16 @@
     --chart-5: 27 87% 67%;
     --highlight-gray:0, 0%, 60%;
     --highlight-red: 10, 80%, 55%;
-    --highlight-green:120, 61%, 50%;
-    --highlight-yellow: 40, 90%, 50%;
-    --highlight-blue:210, 80%, 50%
+    --highlight-green: 120, 61%, 50%;
+    --highlight-teal: 192, 100%, 39%;
+    --highlight-blue: 210, 80%, 50%;
+    --highlight-indigo: 210, 100%, 47%; 
+    --highlight-purple: 240, 85%, 55%; 
+    --highlight-orange: 15, 100%, 40%; 
+    --highlight-yellow: 39, 100%, 50%; 
+    --highlight-light-blue: 210, 70%, 80%; 
+    --highlight-blue: 210, 100%, 50%; 
+    --highlight-dark-blue: 210, 100%, 36%; 
   }
 
   .dark {

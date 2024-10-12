@@ -1,13 +1,10 @@
-/* eslint-disable */
 export interface CronDetailsParams {
-  page?: number;
-  limit?: number;
-  created_after?: string;
-  created_before?: string;
-  status?: "Failed" | "Started" | "Completed" | "";
+  page?: number
+  limit?: number
+  created_after?: string
+  created_before?: string
+  status?: 'Failed' | 'Started' | 'Completed' | ''
 }
-
-
 
 export interface GetAllCronData {
   statusCode: number
@@ -17,7 +14,7 @@ export interface GetAllCronData {
 
 export interface CronData {
   records: CronRecord[]
-  total: number
+  total: any
   page: number
   limit: number
 }

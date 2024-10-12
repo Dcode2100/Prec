@@ -9,7 +9,7 @@ interface FilterRadioButtonsProps {
   setValue: (value: string) => void;
 }
 
-export const FilterRadioButtons: React.FC<FilterRadioButtonsProps> = ({
+const FilterRadioButtons: React.FC<FilterRadioButtonsProps> = ({
   list,
   onSelect,
   value,
@@ -33,3 +33,5 @@ export const FilterRadioButtons: React.FC<FilterRadioButtonsProps> = ({
     </RadioGroup>
   );
 };
+
+export default FilterRadioButtons;

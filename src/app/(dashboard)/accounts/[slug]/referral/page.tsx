@@ -2,12 +2,13 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import { AccountTable } from '@/components/accountTable/AccountTable'
+import AccountTable from '@/components/accountTable/AccountTable'
 import { getAccountReferral } from '@/lib/api/accountApi'
 import { AccountResponse } from '@/lib/types/types'
 import { capitalize } from '@/utils/utils'
 import { format } from 'date-fns'
 import { useParams, useRouter } from 'next/navigation'
+import { ColumnTable } from '@/lib/types'
 
 interface ReferralTableProps {
   accountId: string
@@ -59,21 +60,18 @@ const ReferralTable = ({}: ReferralTableProps): React.ReactElement => {
     }))
   }, [accountReferralData])
 
-  const handleRowClick = (row: any) => {
+  const handleRowClick = (row: { account_id: string }) => {
     router.push(`/accounts/PE/${row.account_id}`)
   }
 
   return (
     <AccountTable
-      columns={columns}
+      columns={columns as ColumnTable<unknown>[]}
       data={tableData}
       totalItems={accountReferralData?.total || 0}
       itemsPerPage={10}
       currentPage={1}
-      onPageChange={(page, pageSize) => {
-        // Implement pagination logic here
-        console.log('Page changed:', page, 'Page size:', pageSize)
-      }}
+      onPageChange={() => {}}
       isLoading={isLoading}
       onRowClick={handleRowClick}
       isSearchable={false}

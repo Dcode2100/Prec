@@ -33,7 +33,7 @@ const CopyableCell = ({ value }: { value: string }) => {
       onClick={(e) => handleCopy(e)}
       onMouseEnter={() => setShowCopyIcon(true)}
       onMouseLeave={() => setShowCopyIcon(false)}
-      className="cursor-pointer flex items-center text-highlight-blue hover:bg-gray-100 p-1 rounded relative w-full"
+      className="cursor-pointer flex items-center text-highlight-bluefont-semibold hover:bg-gray-100 p-1 rounded relative w-full"
       title="Click to copy"
     >
       <span className="pr-6 truncate w-full">{value}</span>

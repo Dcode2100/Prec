@@ -25,10 +25,10 @@ export interface Log {
 }
 
 export interface LogsParams {
-  page?: number;
-  limit?: number;
-  search?:string;
-  created_after?: string;
-  created_before?: string;
-  status?: "NOT_FOUND" | "APPLICATION_ERROR" | "";
+  page?: number
+  limit?: number
+  search?: string
+  created_after?: string
+  created_before?: string
+  type?: string
 }

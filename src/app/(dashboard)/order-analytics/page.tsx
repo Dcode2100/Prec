@@ -89,7 +89,7 @@ const PEDeliveryAnalytics = () => {
   }
 
   const { data: orderAnalytics, isLoading } = useQuery({
-    queryKey: ['order-analytics', dateFilter, pagination],
+    queryKey: ['order-analytics', pagination, dateFilter, pagination],
     queryFn: () => fetchOrder(),
   })
   const handleDateSelect = (
@@ -124,25 +124,41 @@ const PEDeliveryAnalytics = () => {
         <DashboardStatCard
           title="Didn't link Demat"
           value={orderAnalytics?.didNotLinkDemat || 0}
-          onClick={() => router.push(`/order-analytics/did-not-link-demat`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/DID_NOT_LINK_DEMAT?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Linked Demat"
           value={orderAnalytics?.linkedDemat || 0}
-          onClick={() => router.push(`/order-analytics/linked-demat`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/LINKED_DEMAT?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Didn't Link bank"
           value={orderAnalytics?.didNotAddBank || 0}
-          onClick={() => router.push(`/order-analytics/did-not-add-bank`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/DID_NOT_ADD_BANK?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Linked Bank"
           value={orderAnalytics?.linkedBank || 0}
-          onClick={() => router.push(`/order-analytics/linked-bank`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/LINKED_BANK?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>
@@ -151,27 +167,41 @@ const PEDeliveryAnalytics = () => {
         <DashboardStatCard
           title="Clicked on invest now"
           value={orderAnalytics?.clickedOnInvestNow || 0}
-          onClick={() => router.push(`/order-analytics/clicked-on-invest-now`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/CLICKED_ON_INVEST_NOW?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Didn't Add Bank"
           value={orderAnalytics?.didNotAddBankDetails || 0}
           onClick={() =>
-            router.push(`/order-analytics/did-not-add-bank-details`)
+            router.push(
+              `/order-analytics/DID_NOT_ADD_BANK_DETAILS?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
           }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Didn't add Demat"
           value={orderAnalytics?.didNotAddDemat || 0}
-          onClick={() => router.push(`/order-analytics/did-not-add-demat`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/DID_NOT_ADD_DEMAT?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Didn't Confirm Demant"
           value={orderAnalytics?.didNotConfirmDemat || 0}
-          onClick={() => router.push(`/order-analytics/did-not-confirm-demat`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/DID_NOT_CONFIRM_DEMAT?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>
@@ -181,7 +211,9 @@ const PEDeliveryAnalytics = () => {
           title="Didn't click place order"
           value={orderAnalytics?.didNotClickPlaceOrder || 0}
           onClick={() =>
-            router.push(`/order-analytics/did-not-click-place-order`)
+            router.push(
+              `/order-analytics/DID_NOT_CLICK_PLACE_ORDER?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
           }
           isLoading={isLoading}
         />
@@ -191,13 +223,21 @@ const PEDeliveryAnalytics = () => {
         <DashboardStatCard
           title="Didn't Add UPI"
           value={orderAnalytics?.didNotAddUPI || 0}
-          onClick={() => router.push(`/order-analytics/did-not-add-upi`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/DID_NOT_ADD_UPI?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Didn't click Pay Now"
           value={orderAnalytics?.didNotClickPayNow || 0}
-          onClick={() => router.push(`/order-analytics/did-not-click-pay-now`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/DID_NOT_CLICK_PAY_NOW?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>
@@ -207,14 +247,20 @@ const PEDeliveryAnalytics = () => {
           title="Payment Failed/Declined"
           value={orderAnalytics?.paymentPendingCount || 0}
           onClick={() =>
-            router.push(`/order-analytics/payment-failed-declined`)
+            router.push(
+              `/order-analytics/PAYMENT_FAILED_DECLINED?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
           }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Payment Cancelled"
           value={orderAnalytics?.cancelledOrderCount || 0}
-          onClick={() => router.push(`/order-analytics/payment-cancelled`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/CANCELLED?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>
@@ -223,25 +269,41 @@ const PEDeliveryAnalytics = () => {
         <DashboardStatCard
           title="FL Payment completed"
           value={orderAnalytics?.arohUsers?.didNotClickPayNow || 0}
-          onClick={() => router.push(`/order-analytics/fl-payment-completed`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/FL_PAYMENT_COMPLETED?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="FL upload PAN"
           value={orderAnalytics?.arohUsers?.didNotUploadPan || 0}
-          onClick={() => router.push(`/order-analytics/fl-upload-pan`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/FL_UPLOAD_PAN?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Upload Aadhaar"
           value={orderAnalytics?.arohUsers?.didNotUploadAadhaar || 0}
-          onClick={() => router.push(`/order-analytics/fl-upload-aadhaar`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/FL_UPLOAD_AADHAAR?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Sign Consent"
           value={orderAnalytics?.arohUsers?.didNotSignConsentLetter || 0}
-          onClick={() => router.push(`/order-analytics/fl-sign-consent`)}
+          onClick={() =>
+            router.push(
+              `/order-analytics/FL_SIGN_CONSENT?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>

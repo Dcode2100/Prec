@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CheckIcon, XIcon, ClockIcon, CopyIcon } from "lucide-react";
 import moment from "moment";
-import { useRouter } from "next/router";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -25,11 +23,8 @@ const AccountWalletTransactionDetails = ({
   isOpen,
   onClose,
   transaction_id,
-  setLoading,
 }: AccountWalletTransactionDetailsProps): React.ReactElement => {
   const { toast } = useToast();
-//   const router = useRouter();
-
   const { data: transactionData, isLoading: isTransactionLoading } = useQuery({
     queryKey: ["transaction_details", transaction_id],
     queryFn: () => getAccountWalletTransactionsById(transaction_id),

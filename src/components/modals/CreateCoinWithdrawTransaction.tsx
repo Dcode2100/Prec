@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -14,15 +14,14 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
 interface CreateCoinWithdrawTransactionProps {
   openCoinWithdrawTransactionModal: boolean;
   setOpenCoinWithdrawTransactionModal: (value: boolean) => void;
   accountId: string;
-  coinBalance?: number | string;
-  refetch: any;
+  coinBalance?: number | string
+  refetch: () => void
 }
 
 const CreateCoinWithdrawTransaction = ({

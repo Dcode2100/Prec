@@ -1,38 +1,41 @@
 import { getGlobalItem } from '@/utils/utils'
-import { GenericResponse, WishlistsResponse } from '../types/types'
+import {
+  GenericResponse,
+  GenericResponseWithMessage,
+  GetAllPCWishlistsResponse,
+  WishlistsParams,
+  WishlistsResponse,
+} from '../types/types'
 import axiosInstance, { setInstance } from '../api/axiosInstance'
 
-export const getWishlistData =
-  async (params: {}): Promise<WishlistsResponse> => {
-    setInstance(axiosInstance)
-    const response: any = await axiosInstance.get('/dashboard/wishlists', {
-      params,
-    })
-    return response?.data.data.wishlists
-  }
+export const getWishlistData = async (
+  params: WishlistsParams
+): Promise<WishlistsResponse> => {
+  setInstance(axiosInstance)
+  const response = await axiosInstance.get('/dashboard/wishlists', {
+    params,
+  })
+  return response?.data.data
+}
 
 export const updateWishlist = async (
   wishlistId: string,
-  body: any
-): Promise<any> => {
-  try {
-    const wishlistResponse: any = await axiosInstance.put(
-      `/dashboard/wishlists/${wishlistId}`,
-      body
-    )
-    return wishlistResponse
-  } catch (err) {
-    if (err instanceof Error) throw new Error(`Update failed. ${err?.message}`)
-    return err
-  }
+  notified: boolean
+): Promise<GenericResponseWithMessage> => {
+  const wishlistResponse = await axiosInstance.put(
+    `/dashboard/wishlists/${wishlistId}`,
+    {
+      notified,
+    }
+  )
+  return wishlistResponse.data
 }
 
-export const UploadWishlistData = async (formData: any): Promise<any> => {
-  const response: any = await axiosInstance.put(
-    `dashboard/wishlists/bulk`,
-    formData
-  )
-  return response
+export const UploadWishlistData = async (
+  formData: FormData
+): Promise<GenericResponse<{ status: boolean }>> => {
+  const response = await axiosInstance.put(`dashboard/wishlists/bulk`, formData)
+  return response.data
 }
 
 export const getAccountWishlist = async (
@@ -63,7 +66,38 @@ export const getAccountPcWishlist = async (accountId: string, params: any) => {
     {
       params,
     }
-  );
-  return res.data?.data?.wishlists;
+  )
+  return res.data?.data?.wishlists
+}
+export const getPCWishlistData = async (
+  params: WishlistsParams
+): Promise<GetAllPCWishlistsResponse> => {
+  setInstance(axiosInstance)
+  const response = await axiosInstance.get('/dashboard/pc/wishlists', {
+    params,
+  })
+  return response?.data.data
+}
 
+export const updatePcWishlist = async (
+  id: string,
+  notified: boolean
+): Promise<GenericResponseWithMessage> => {
+  const wishlistResponse = await axiosInstance.put(
+    `/dashboard/pc/wishlists/${id}`,
+    {
+      notified,
+    }
+  )
+  return wishlistResponse.data
+}
+
+export const UploadPcWishlistData = async (
+  formData: FormData
+): Promise<GenericResponse<{ status: boolean }>> => {
+  const response = await axiosInstance.put(
+    `dashboard/pc/wishlists/bulk`,
+    formData
+  )
+  return response.data
 }

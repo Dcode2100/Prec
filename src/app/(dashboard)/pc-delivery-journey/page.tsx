@@ -20,7 +20,7 @@ import {
   RecentHoldings,
   RecentSubscriptionProcessingOrder,
 } from '@/lib/types/pcDeliveryType'
-import UploadCSV from './components/UploadCsv'
+import UploadCSV from '@/components/UploadCsv'
 import { Loader2 } from 'lucide-react' // Add this import
 
 const DashboardStatCard = ({ title, value, onClick, isLoading }) => {
@@ -43,7 +43,7 @@ const DashboardStatCard = ({ title, value, onClick, isLoading }) => {
     </Card>
   )
 }
-const PEDeliveryAnalytics = () => {
+const PCDeliveryAnalytics = () => {
   const router = useRouter()
   const [pagination, setPagination] = useState({
     common: { limit: 10, page: 1 },
@@ -139,19 +139,31 @@ const PEDeliveryAnalytics = () => {
         <DashboardStatCard
           title="Subscription Processing Pending"
           value={orderAnalytics?.data?.subscription_processing_count ?? 0}
-          onClick={() => router.push(`/pc-delivery-journey/pending`)}
+          onClick={() =>
+            router.push(
+              `/pc-delivery-journey/pending?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Subscription Processed"
           value={orderAnalytics?.data?.subscription_processed_count ?? 0}
-          onClick={() => router.push(`/pc-delivery-journey/processed`)}
+          onClick={() =>
+            router.push(
+              `/pc-delivery-journey/processed?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Holding Yet To Start"
           value={orderAnalytics?.data?.holdings_yet_to_start_count ?? 0}
-          onClick={() => router.push(`/pc-delivery-journey/yet-to-start`)}
+          onClick={() =>
+            router.push(
+              `/pc-delivery-journey/yet-to-start?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>
@@ -160,19 +172,31 @@ const PEDeliveryAnalytics = () => {
         <DashboardStatCard
           title="Holding Started"
           value={orderAnalytics?.data?.holdings_started_count ?? 0}
-          onClick={() => router.push(`/pc-delivery-journey/started`)}
+          onClick={() =>
+            router.push(
+              `/pc-delivery-journey/started?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Holding Ended"
           value={orderAnalytics?.data?.holdings_ended_count ?? 0}
-          onClick={() => router.push(`/pc-delivery-journey/ended`)}
+          onClick={() =>
+            router.push(
+              `/pc-delivery-journey/ended?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Holding Repaid"
           value={orderAnalytics?.data?.holdings_repaid_count ?? 0}
-          onClick={() => router.push(`/pc-delivery-journey/repaid`)}
+          onClick={() =>
+            router.push(
+              `/pc-delivery-journey/repaid?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>
@@ -214,4 +238,4 @@ const PEDeliveryAnalytics = () => {
   )
 }
 
-export default PEDeliveryAnalytics
+export default PCDeliveryAnalytics

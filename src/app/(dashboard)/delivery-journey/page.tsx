@@ -11,14 +11,22 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
-import { DataTable } from './components/table/data-table'
+import { DataTable } from '@/components/CustomTable/data-table'
 import { columns, columnsForPanPending } from './components/table/columns'
 import { ColumnDef } from '@tanstack/react-table'
 import FilterDateSelect from './components/filterDrawer'
 import { Moment } from 'moment'
 import { Button } from '@/components/ui/button'
-import UploadCSV from './components/UploadCsv'
+import UploadCSV from '@/components/UploadCsv'
 import { Loader2 } from 'lucide-react' // Add this import
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { selectOptions } from './components/table/data'
 
 const DashboardStatCard = ({ title, value, onClick, isLoading }) => {
   return (
@@ -122,19 +130,31 @@ const PEDeliveryAnalytics = () => {
         <DashboardStatCard
           title="Shares Transfer Pending"
           value={orderAnalytics?.sharesTransferPendingCount || 0}
-          onClick={() => router.push(`/delivery-journey/transfer-pending`)}
+          onClick={() =>
+            router.push(
+              `/delivery-journey/transfer-pending?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Verification Pending"
           value={orderAnalytics?.verificationPendingOrdersCount || 0}
-          onClick={() => router.push(`/delivery-journey/verification-pending`)}
+          onClick={() =>
+            router.push(
+              `/delivery-journey/verification-pending?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="NSE Paid Orders"
           value={orderAnalytics?.nsePaidOrdersCount || 0}
-          onClick={() => router.push(`/delivery-journey/nse-paid`)}
+          onClick={() =>
+            router.push(
+              `/delivery-journey/nse-paid?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>
@@ -143,26 +163,46 @@ const PEDeliveryAnalytics = () => {
         <DashboardStatCard
           title="Shares Transfer Failed"
           value={orderAnalytics?.sharesTransferFailedCount || 0}
-          onClick={() => router.push(`/delivery-journey/transfer-failed`)}
+          onClick={() =>
+            router.push(
+              `/delivery-journey/transfer-failed?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="User Pan Link Pending"
           value={orderAnalytics?.userPanLinkPendingCount || 0}
-          onClick={() => router.push(`/delivery-journey/pan-pending`)}
+          onClick={() =>
+            router.push(
+              `/delivery-journey/pan-pending?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>
       <Separator className="my-4 mx-4 " />
       <div className="w-full px-4 mt-4">
         <h2 className="text-2xl font-semibold mb-4">Recent orders</h2>
+        <div className="mb-4">
+          <Select value={filter} onValueChange={(value) => setFilter(value)}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select filter" />
+            </SelectTrigger>
+            <SelectContent>
+              {selectOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <DataTable
           columns={
             getColumns() as ColumnDef<UsersPanPendingResponse, orderDetails>[]
           }
           data={getFilteredData()}
-          enableSearch={false}
-          enableDropdown={true}
           page={pagination.common.page}
           limit={pagination.common.limit}
           onPageChange={(page) => {
@@ -177,11 +217,8 @@ const PEDeliveryAnalytics = () => {
               common: { ...prev.common, limit },
             }))
           }}
-          filter={filter}
-          onChangeFilter={(filter) => setFilter(filter)}
           total={getFilteredTotal()}
           isLoading={isLoading}
-          refetch={() => {}}
         />
       </div>
     </div>

@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import moment from 'moment'
-import { AccountTable } from '@/components/accountTable/AccountTable'
+import AccountTable from '@/components/accountTable/AccountTable'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useToast } from '@/hooks/use-toast'
 import { getSellOrders, getSellOrdersByAccountId } from '@/lib/api/ordersApi'
 import { CSVLink } from 'react-csv'
 import {
@@ -51,7 +50,6 @@ const SellOrdersTable = (): React.ReactElement => {
   const type = parts[0]
   const accountId = parts.slice(1).join('-')
 
-  const [selectedOrder, setSelectedOrder] = useState<string | undefined>()
   const [qtyFilterType, setQtyFilterType] = useState<string>('between')
   const [tempQtyStart, setTempQtyStart] = useState<number>(0)
   const [tempQtyEnd, setTempQtyEnd] = useState<number>(10000)
@@ -62,7 +60,6 @@ const SellOrdersTable = (): React.ReactElement => {
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(20)
   const [search, setSearch] = useState('')
-  const { toast } = useToast()
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
@@ -116,7 +113,7 @@ const SellOrdersTable = (): React.ReactElement => {
     SUCCESS: 'Completed',
   }
 
-  const columns : ColumnTable<OrderResponse>[] = [
+  const columns: ColumnTable<OrderResponse>[] = [
     { header: 'Order ID', accessorKey: 'gui_order_id' },
     { header: 'Account ID', accessorKey: 'gui_account_id' },
     { header: 'Side', accessorKey: 'side' },
@@ -127,8 +124,8 @@ const SellOrdersTable = (): React.ReactElement => {
       header: 'Status',
       accessorKey: 'status',
       cell: ({ getValue }) => {
-        const status = getValue() as keyof typeof peStatusOptions;
-        return peStatusOptions[status] || status;
+        const status = getValue() as keyof typeof peStatusOptions
+        return peStatusOptions[status] || status
       },
     },
     {
@@ -141,10 +138,6 @@ const SellOrdersTable = (): React.ReactElement => {
   const handleSearch = (value: string) => {
     setSearch(value)
     setPage(1)
-  }
-
-  const handleRowClick = (row: any) => {
-    setSelectedOrder(row.order_id)
   }
 
   const handleApplyFilters = () => {
@@ -225,8 +218,12 @@ const SellOrdersTable = (): React.ReactElement => {
                   <SelectValue placeholder="Select filter type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="greater_than_equal_to">Greater Than or Equal To</SelectItem>
-                  <SelectItem value="less_than_equal_to">Less Than or Equal To</SelectItem>
+                  <SelectItem value="greater_than_equal_to">
+                    Greater Than or Equal To
+                  </SelectItem>
+                  <SelectItem value="less_than_equal_to">
+                    Less Than or Equal To
+                  </SelectItem>
                   <SelectItem value="equal">Equal</SelectItem>
                   <SelectItem value="between">Between</SelectItem>
                 </SelectContent>
@@ -236,16 +233,27 @@ const SellOrdersTable = (): React.ReactElement => {
                   <Input
                     type="number"
                     value={tempQtyStart}
-                    onChange={(e) => handleQtyFilterChange([parseInt(e.target.value), tempQtyEnd])}
+                    onChange={(e) =>
+                      handleQtyFilterChange([
+                        parseInt(e.target.value),
+                        tempQtyEnd,
+                      ])
+                    }
                     className="w-20"
                   />
                 )}
                 {qtyFilterType === 'between' && <span>to</span>}
-                {(qtyFilterType === 'less_than_equal_to' || qtyFilterType === 'between') && (
+                {(qtyFilterType === 'less_than_equal_to' ||
+                  qtyFilterType === 'between') && (
                   <Input
                     type="number"
                     value={tempQtyEnd}
-                    onChange={(e) => handleQtyFilterChange([tempQtyStart, parseInt(e.target.value)])}
+                    onChange={(e) =>
+                      handleQtyFilterChange([
+                        tempQtyStart,
+                        parseInt(e.target.value),
+                      ])
+                    }
                     className="w-20"
                   />
                 )}
@@ -311,7 +319,6 @@ const SellOrdersTable = (): React.ReactElement => {
           }}
           onSearch={handleSearch}
           isLoading={isLoading}
-          onRowClick={handleRowClick}
         />
       </div>
     </>

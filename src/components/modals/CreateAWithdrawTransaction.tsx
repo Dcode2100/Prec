@@ -31,7 +31,7 @@ interface CreateAWithdrawTransactionProps {
   setOpenWithdrawTransactionModal: (value: boolean) => void;
   accountId: string;
   balance?: number | string;
-  refetch: any;
+  refetch: () => void;
 }
 
 const CreateAWithdrawTransaction = ({
@@ -52,9 +52,9 @@ const CreateAWithdrawTransaction = ({
     transactionFees: Yup.string()
       .typeError("Transaction Fees is required")
       .nullable()
-      .when("amount", (amount: any, schema: any) => {
+      .when("amount", (amount, schema) => {
         return schema.test({
-          test: (approvedAmount: any) => {
+          test: (approvedAmount: string | undefined | null) => {
             if (!approvedAmount) return true;
             return Number(approvedAmount) < Number(amount);
           },
@@ -116,7 +116,7 @@ const CreateAWithdrawTransaction = ({
   // 3. if pcWithdrawal changes
   //    a. transaction fees will be zero and settlement amount calculated accordingly
   //    b. transaction fees will be default or user typed and settlement amount calculated accordingly
-  const calculateSettlementAmount = (event: string, value: string) => {
+  const calculateSettlementAmount = (event: string, value: string | boolean) => {
     const transactionFeesPercent = 0.0097;
     if (event === "amount") {
       const currentAmount = Number(value);
@@ -140,20 +140,20 @@ const CreateAWithdrawTransaction = ({
     }
   }
 
-  const handleInputChange = (e: any) => {
-    let value = e.target.value;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; checked: boolean } }) => {
+    let value: string | boolean = 'value' in e.target ? e.target.value : e.target.checked;
     const name = e.target.name;
     const regex = /^[0-9]*(\.[0-9]{0,2})?$/;
     if (name === "amount") {
-      regex.test(value) && calculateSettlementAmount(name, value)
+      regex.test(value as string) && calculateSettlementAmount(name, value as string)
     } else if (name === "transactionFees") {
-      regex.test(value) && calculateSettlementAmount(name, value)
+      regex.test(value as string) && calculateSettlementAmount(name, value as string)
     } else if (name === "pcWithdrawal") {
-      value = e.target.checked
-      calculateSettlementAmount(name, value)
-      form.setValue("pcWithdrawal", value);
+      value = 'checked' in e.target ? e.target.checked : value;
+      calculateSettlementAmount(name, value as boolean)
+      form.setValue("pcWithdrawal", value as boolean);
     } else if (name === "note") {
-      form.setValue("note", value, { shouldValidate: true });
+      form.setValue("note", value as string, { shouldValidate: true });
     }
   }
 

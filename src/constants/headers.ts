@@ -154,3 +154,137 @@ export const acquisitionHeaders = [
   { label: 'Created At', key: 'createdAt' },
   { label: 'Updated At', key: 'updatedAt' },
 ]
+export const orderAnalyticsAccountsHeaders = [
+  { label: 'GUI Account ID', key: 'gui_account_id' },
+  { label: 'First Name', key: 'firstName' },
+  { label: 'Last Name', key: 'lastName' },
+  { label: 'Email', key: 'email' },
+  { label: 'Mobile', key: 'mobile' },
+  { label: 'Status', key: 'status' },
+  { label: 'Orders Count', key: 'orders_count' },
+  {
+    label: 'WhatsApp Notification',
+    key: 'whatsapp_notification',
+  },
+  { label: 'Created At', key: 'created_at' },
+  {
+    label: 'Evaluation Expiry Date',
+    key: 'evaluationExpiryDate',
+  },
+  { label: 'Onboarding Tracker', key: 'onBoardingTracker' },
+  { label: 'Active', key: 'active' },
+]
+export const orderAnalyticsOrdersHeaders = [
+  { label: 'Order ID', key: 'gui_order_id' },
+  { label: 'Account ID', key: 'gui_account_id' },
+  { label: 'First Name', key: 'firstName' },
+  { label: 'Last Name', key: 'lastName' },
+  { label: 'Email', key: 'email' },
+  { label: 'Mobile', key: 'mobile' },
+  { label: 'Symbol', key: 'symbol' },
+  { label: 'Price', key: 'price' },
+  { label: 'Quantity', key: 'quantity' },
+  { label: 'Status', key: 'status' },
+  { label: 'Created At', key: 'created_at' },
+]
+
+export const peHoldingHeaders = [
+  { label: 'Account ID', key: 'account_id' },
+  { label: 'GUI Account ID', key: 'gui_account_id' },
+  { label: 'First Name', key: 'first_name' },
+  { label: 'Middle Name', key: 'middle_name' },
+  { label: 'Last Name', key: 'last_name' },
+  { label: 'Symbol', key: 'symbol' },
+  { label: 'Token', key: 'token' },
+  { label: 'Mobile', key: 'mobile' },
+  { label: 'Email', key: 'email' },
+  { label: 'Price', key: 'price' },
+  { label: 'Quantity', key: 'quantity' },
+  { label: 'Holding ID', key: 'holding_id' },
+  { label: 'Buy Transaction Fees', key: 'buy_transaction_fees' },
+  { label: 'Sell Transaction Fees', key: 'sell_transaction_fees' },
+  { label: 'Amount', key: 'amount' },
+  { label: 'Created At', key: 'created_at' },
+]
+
+export const pcHoldingHeaders = [
+  { label: 'Holding ID', key: 'id' },
+  { label: 'Account ID', key: 'account_id' },
+  { label: 'GUI Account ID', key: 'gui_account_id' },
+  { label: 'First Name', key: 'first_name' },
+  { label: 'Middle Name', key: 'middle_name' },
+  { label: 'Last Name', key: 'last_name' },
+  { label: 'Symbol', key: 'symbol' },
+  { label: 'Mobile', key: 'mobile' },
+  { label: 'Email', key: 'email' },
+  { label: 'Charges', key: 'charges' },
+  { label: 'Buy Transaction Fees', key: 'buy_transaction_fees' },
+  { label: 'Price', key: 'price' },
+  { label: 'Quantity', key: 'quantity' },
+  { label: 'Returns', key: 'returns' },
+  { label: 'Status', key: 'status' },
+  { label: 'Subscription Amount', key: 'subscription_amount' },
+  { label: 'Min Repayment Amount', key: 'min_repayment_amount' },
+  { label: 'Created At', key: 'created_at' },
+]
+
+export const wishlistHeaders = [
+  { label: 'wishlist_id', key: 'wishlist_id' },
+  { label: 'Token', key: 'token' },
+  { label: 'Name', key: 'name' },
+  { label: 'Account Id', key: 'gui_account_id' },
+  { label: 'First Name', key: 'first_name' },
+  { label: 'Middle Name', key: 'middle_name' },
+  { label: 'Last Name', key: 'last_name' },
+  { label: 'Email', key: 'email' },
+  { label: 'Mobile', key: 'mobile' },
+  { label: 'Notified', key: 'notified' },
+]
+
+export const pcWishlistHeaders = [
+  { label: 'Token', key: 'name' },
+  { label: 'Account Id', key: 'gui_account_id' },
+  { label: 'First Name', key: 'first_name' },
+  { label: 'Last Name', key: 'last_name' },
+  { label: 'Email', key: 'email' },
+  { label: 'Mobile', key: 'mobile' },
+  { label: 'Notified', key: 'notify' },
+]
+export const nominatorHeaders = [
+  { label: 'Name', key: 'name' },
+  { label: 'Code', key: 'code' },
+  { label: 'Logo', key: 'logo' },
+  { label: 'Accounts', key: 'accounts' },
+  { label: 'Created At', key: 'created_at' },
+]
+
+export const nominatorAccountsHeaders = [
+  { label: 'Account ID', key: 'gui_account_id' },
+  { label: 'First Name', key: 'first_name' },
+  { label: 'Last Name', key: 'last_name' },
+  { label: 'Mobile', key: 'mobile' },
+  { label: 'Email', key: 'email' },
+  { label: 'Orders', key: 'orders_count' },
+  { label: 'Order value', key: 'order_value' },
+  { label: 'Transaction fee', key: 'transaction_fee' },
+  { label: 'Stamp Duty', key: 'stamp_duty' },
+  { label: 'Holdings Count', key: 'holdings_count' },
+  { label: 'Holding Value', key: 'holding_value' },
+  { label: 'Status', key: 'status' },
+  { label: 'Created At', key: 'created_at' },
+]
+
+export const pcEnquiryHeaders = [
+  { label: 'account_id', key: 'user_id' },
+  { label: 'Account ID', key: 'gui_account_id' },
+  { label: 'First Name', key: 'first_name' },
+  { label: 'Last name', key: 'last_name' },
+  { label: 'Email', key: 'email' },
+  { label: 'Mobile', key: 'mobile' },
+  { label: 'Wallet Balance', key: 'wallet_balance' },
+  { label: 'No of Holdings', key: 'no_of_holdings' },
+  { label: 'No of Paid Orders', key: 'no_of_paid_orders' },
+  { label: 'Total Holdings Amount', key: 'total_holdings_amount' },
+  { label: 'PC Active', key: 'pc_active' },
+  { label: 'Created At', key: 'created_at' },
+]

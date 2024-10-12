@@ -16,8 +16,9 @@ const DASHBOARD_NAVIGATION: TabType[] = [
   {
     text: "Holdings",
     component: null,
+    href: "/accounts/[slug]/holdings/peHoldings",
     subTabs: [
-      { text: "PE Holdings", component: "HoldingsTable", href: "/accounts/[slug]/holdings/" },
+      { text: "PE Holdings", component: "HoldingsTable", href: "/accounts/[slug]/holdings/peHoldings" },
       { text: "PC Holdings", component: "PCHoldingsTable", href: "/accounts/[slug]/holdings/pcHoldings" },
     ],
   },
@@ -30,7 +31,7 @@ const DASHBOARD_NAVIGATION: TabType[] = [
         component: null,
         href: "/accounts/[slug]/orders/peOrders",
         subTabs: [
-          { text: "Buy", component: "OrdersTable", href: "/accounts/[slug]/orders/peOrders" },
+          { text: "Buy", component: "OrdersTable", href: "/accounts/[slug]/orders/peOrders/" },
           { text: "Sell", component: "SellOrdersTable", href: "/accounts/[slug]/orders/peOrders/peSell" },
         ],
       },
@@ -49,26 +50,16 @@ const DASHBOARD_NAVIGATION: TabType[] = [
         component: null,
         href: "/accounts/[slug]/transactions/wallet",
         subTabs: [
-          { text: "All", component: "AccountWallet", href: "/accounts/[slug]/transactions/wallet" },
+          { text: "All", component: "AccountWallet", href: "/accounts/[slug]/transactions/wallet/" },
           { 
             text: "Credit", 
             component: "CreditWalletTransactions",
             href: "/accounts/[slug]/transactions/wallet/credit",
-            // subTabs: [
-            //   { text: "All", component: null, href: "/accounts/[slug]/transactions/wallet/credit" },
-            //   { text: "Process Pending Deposits", component: null, href: "/accounts/[slug]/transactions/wallet/credit" },
-            // ],
           },
           { 
             text: "Debit", 
             component: "DebitWalletTransactions",
             href: "/accounts/[slug]/transactions/wallet/debit",
-            subTabs: [
-              { text: "All", component: null, href: "/accounts/[slug]/transactions/wallet/debit" },
-              { text: "Order", component: null, href: "/accounts/[slug]/transactions/wallet/debit/order" },
-              { text: "Withdrawals", component: null, href: "/accounts/[slug]/transactions/wallet/debit/withdrawals" },
-              { text: "Process Pending Withdrawals", component: null, href: "/accounts/[slug]/transactions/wallet/debit/pending-withdrawals" },
-            ],
           },
         ],
       },

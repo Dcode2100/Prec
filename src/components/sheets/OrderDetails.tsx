@@ -11,7 +11,7 @@ import Loader from "@/components/Loader";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import CopyButton from "@/components/CopyButton";
+import { CopyButton } from "@/components/CopyButton";
 import { capitalize, getNumberInRupee } from "@/utils/utils";
 import {
   getOrdersById,

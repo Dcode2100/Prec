@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { DataTable } from '../components/table/data-table'
 
 import FilterDateSelect from '../components/filterDrawer'
-import { Moment } from 'moment'
+import moment, { Moment } from 'moment'
 import { Button } from '@/components/ui/button'
 import { ColumnDef } from '@tanstack/react-table'
 import { getPCOrders } from '@/lib/api/ordersApi'
@@ -13,8 +13,10 @@ import { CSVLink } from 'react-csv'
 import { RecentSubscriptionProcessingOrder } from '@/lib/types/pcDeliveryType'
 import { columnsForProcessingPage } from '../components/table/columns'
 import { exportPcHoldingsHeaders } from '@/constants/headers'
+import { useSearchParams } from 'next/navigation'
 
 const PEPendingOrders = () => {
+  const searchParams = useSearchParams()
   const [pagination, setPagination] = useState({
     common: { limit: 10, page: 1 },
   })
@@ -23,11 +25,14 @@ const PEPendingOrders = () => {
   const [dateFilter, setDateFilter] = useState<{
     startDate: Moment | null
     endDate: Moment | null
-  }>({
-    startDate: null,
-    endDate: null,
+  }>(() => {
+    const startDate = searchParams.get('startDate')
+    const endDate = searchParams.get('endDate')
+    return {
+      startDate: startDate ? moment(startDate) : null,
+      endDate: endDate ? moment(endDate) : null,
+    }
   })
-
   const fetchOrder = async () => {
     const params: OrdersParams = {
       status: 'SUBSCRIPTION_PROCESSED',

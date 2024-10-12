@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { AccountTable } from '@/components/accountTable/AccountTable'
+import AccountTable from '@/components/accountTable/AccountTable'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
@@ -11,14 +11,11 @@ import { CSVLink } from 'react-csv'
 import { getAllCoinTransactions } from '@/lib/api/transactionsApi'
 import {
   CoinTransactionResponse,
-  TransactionsParams,
-  TransactionStatus,
-  WalletTransactionDirection,
+  TransactionsParams, WalletTransactionDirection
 } from '@/lib/types/types'
-import { capitalize } from '@/lib/globals/utils'
+import { capitalize } from '@/utils/utils'
 import { getGlobalItem } from '@/utils/utils'
 import { Pe } from '@/lib/types/walletType'
-import { ColumnDef } from '@tanstack/react-table'
 import { ColumnTable } from '@/lib/types'
 
 // Define a type that represents the intersection of Pe and CoinTransactionResponse
@@ -49,11 +46,6 @@ function mapPeToCoinTransactionResponse(pe: PeWithCoinTransactionFields): CoinTr
   };
 }
 
-type ColumnDefinition<T> = {
-  header: string
-  accessorKey: keyof T
-  cell?: (value: T[keyof T], row: T) => React.ReactNode
-}
 
 interface TransactionsProps {
   accountId?: string
@@ -62,16 +54,12 @@ interface TransactionsProps {
 
 const CoinTransactionTable = ({
   accountId,
-  type,
 }: TransactionsProps): React.ReactElement => {
   const [selectedTab, setSelectedTab] = useState('all')
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(20)
   const [search, setSearch] = useState('')
-  const { toast } = useToast()
-
-  const isAffiliate = getGlobalItem('isAffiliate')
-
+  
   const queryKey = [
     'coinTransactions',
     accountId,
@@ -81,7 +69,7 @@ const CoinTransactionTable = ({
     search,
   ]
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey,
     queryFn: async () => {
       const params: TransactionsParams = {

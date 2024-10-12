@@ -10,18 +10,79 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
-
 import { manualCoinTransfer } from '@/lib/api/coinApi'
 import AddFundsModal from '@/components/modals/AddFundsModal'
 import CreateAWithdrawTransaction from '@/components/modals/CreateAWithdrawTransaction'
 import CreateCoinWithdrawTransaction from '@/components/modals/CreateCoinWithdrawTransaction'
 
+// New types
+type Contact = {
+  name?: string
+  email?: string
+  mobile?: string
+  whatsapp_notification?: boolean
+  created_at?: string
+  updated_at?: string
+}
 
-const ContactAccordion = ({ contact }: { contact: any }) => (
+type Identity = {
+  pan?: string
+  pan_linked?: boolean
+  pan_updated_at?: string
+}
+
+type BankDetails = {
+  account_number?: string
+  bank_name?: string
+  branch?: string
+  ifsc?: string
+  verification_status?: string
+}
+
+type VABankDetails = {
+  account_number?: string
+  ifsc?: string
+}
+
+type WalletDetails = {
+  vendor_name?: string
+  provider_name?: string
+  migrated?: boolean
+  acknowledged?: boolean
+  acknowledged_at?: string
+}
+
+type AccountDetails = {
+  account_id: string
+  wallet_id?: string
+  contact: Contact
+  bank_details?: BankDetails
+  va_bank_details?: VABankDetails
+  wallet_details?: WalletDetails
+  aroh_user_funds?: {
+    total_investment?: string
+    current_value?: string
+    accrued_returns?: string
+  }
+  user_funds?: {
+    pnl?: string
+    pnl_percentage?: string
+    current_value?: string
+    total_investment?: string
+    balance?: string
+  }
+  wallet_withdraw_amount?: string
+  coins?: number
+  status?: string
+  decentro_wallet_id?: string
+  wallet_balance?: string
+}
+
+const ContactAccordion = ({ contact }: { contact: Contact }) => (
   <Accordion type="single" collapsible className="w-full">
     <AccordionItem value="contact-details">
       <AccordionTrigger>Contact Details</AccordionTrigger>
@@ -67,7 +128,7 @@ const ContactItem = ({ label, value }: { label: string; value: string }) => (
   </div>
 )
 
-const IdentityAccordion = ({ identity }: { identity: any }) => (
+const IdentityAccordion = ({ identity }: { identity: Identity }) => (
   <Accordion type="single" collapsible className="w-full">
     <AccordionItem value="identity-details">
       <AccordionTrigger>Identity Details</AccordionTrigger>
@@ -95,7 +156,7 @@ const IdentityItem = ({ label, value }: { label: string; value: string }) => (
   </div>
 )
 
-const BankDetailsAccordion = ({ bankDetails }: { bankDetails: any }) => (
+const BankDetailsAccordion = ({ bankDetails }: { bankDetails: BankDetails }) => (
   <Accordion type="single" collapsible className="w-full">
     <AccordionItem value="bank-details">
       <AccordionTrigger>Bank Details</AccordionTrigger>
@@ -125,7 +186,7 @@ const BankItem = ({ label, value }: { label: string; value: string }) => (
   </div>
 )
 
-const VABankDetailsAccordion = ({ vaBankDetails }: { vaBankDetails: any }) => (
+const VABankDetailsAccordion = ({ vaBankDetails }: { vaBankDetails: VABankDetails }) => (
   <Accordion type="single" collapsible className="w-full">
     <AccordionItem value="va-bank-details">
       <AccordionTrigger>VA Bank Details</AccordionTrigger>
@@ -149,7 +210,7 @@ const VABankItem = ({ label, value }: { label: string; value: string }) => (
   </div>
 )
 
-const WalletDetailsAccordion = ({ walletDetails }: { walletDetails: any }) => (
+const WalletDetailsAccordion = ({ walletDetails }: { walletDetails: WalletDetails }) => (
   <Accordion type="single" collapsible className="w-full">
     <AccordionItem value="wallet-details">
       <AccordionTrigger>Wallet Details</AccordionTrigger>
@@ -226,10 +287,18 @@ const AccountDetailsPage = () => {
   const [addCoins, setAddCoins] = useState<string>('')
   const [isLoadingAddCoins, setIsLoadingAddCoins] = useState(false)
   const [openAddFundsModal, setOpenAddFundsModal] = useState(false)
-  const [openWithdrawTransactionModal, setOpenWithdrawTransactionModal] = useState(false)
-  const [openCoinWithdrawTransactionModal, setOpenCoinWithdrawTransactionModal] = useState(false)
+  const [openWithdrawTransactionModal, setOpenWithdrawTransactionModal] =
+    useState(false)
+  const [
+    openCoinWithdrawTransactionModal,
+    setOpenCoinWithdrawTransactionModal,
+  ] = useState(false)
 
-  const { data: accountDetails, isLoading, refetch } = useQuery({
+  const {
+    data: accountDetails,
+    isLoading,
+    refetch,
+  } = useQuery<AccountDetails | null>({
     queryKey: ['account', slug],
     queryFn: async () => {
       const parts = slug?.split('-')
@@ -257,23 +326,23 @@ const AccountDetailsPage = () => {
           refetch()
           setAddCoins('')
           toast({
-            description: response?.data?.message || "Coins added successfully",
-            variant: "default",
+            description: response?.data?.message || 'Coins added successfully',
+            variant: 'default',
           })
         }
       } catch (err) {
         console.error(err)
         toast({
-          description: "Failed to add coins",
-          variant: "destructive",
+          description: 'Failed to add coins',
+          variant: 'destructive',
         })
       } finally {
         setIsLoadingAddCoins(false)
       }
     } else {
       toast({
-        description: "Account wallet id is missing",
-        variant: "destructive",
+        description: 'Account wallet id is missing',
+        variant: 'destructive',
       })
       setIsLoadingAddCoins(false)
     }
@@ -292,18 +361,18 @@ const AccountDetailsPage = () => {
           </h2>
         </div>
 
-        <ContactAccordion contact={accountDetails?.contact} />
+        <ContactAccordion contact={accountDetails?.contact as Contact} />
 
-        <IdentityAccordion identity={accountDetails} />
+        <IdentityAccordion identity={accountDetails?.identity as Identity} />
 
-        <BankDetailsAccordion bankDetails={accountDetails?.bank_details} />
+        <BankDetailsAccordion bankDetails={accountDetails?.bank_details as BankDetails} />
 
         <VABankDetailsAccordion
-          vaBankDetails={accountDetails?.va_bank_details}
+          vaBankDetails={accountDetails?.va_bank_details as VABankDetails}
         />
 
         <WalletDetailsAccordion
-          walletDetails={accountDetails?.wallet_details}
+          walletDetails={accountDetails?.wallet_details as WalletDetails}
         />
 
         <div className="mt-8">
@@ -382,17 +451,32 @@ const AccountDetailsPage = () => {
                 onChange={(e) => setAddCoins(e.target.value)}
                 className="flex-grow"
               />
-              <Button onClick={handleAddCoins} disabled={isLoadingAddCoins || !addCoins}>
+              <Button
+                onClick={handleAddCoins}
+                disabled={isLoadingAddCoins || !addCoins}
+              >
                 {isLoadingAddCoins ? 'Adding...' : 'Add coins'}
               </Button>
             </div>
-            <Button variant="secondary" className="w-full" onClick={() => setOpenCoinWithdrawTransactionModal(true)}>
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={() => setOpenCoinWithdrawTransactionModal(true)}
+            >
               Withdraw coins
             </Button>
-            <Button variant="secondary" className="w-full" onClick={() => setOpenWithdrawTransactionModal(true)}>
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={() => setOpenWithdrawTransactionModal(true)}
+            >
               Withdraw funds
             </Button>
-            <Button variant="default" className="w-full" onClick={() => setOpenAddFundsModal(true)}>
+            <Button
+              variant="default"
+              className="w-full"
+              onClick={() => setOpenAddFundsModal(true)}
+            >
               Add funds
             </Button>
           </div>
@@ -403,7 +487,7 @@ const AccountDetailsPage = () => {
         openAddFundsModal={openAddFundsModal}
         setOpenAddFundsModal={setOpenAddFundsModal}
         getAccountRefetch={refetch}
-        decentroWalletId={accountDetails?.decentro_wallet_id}
+        decentroWalletId={accountDetails?.decentro_wallet_id ?? ''}
         accountId={accountDetails?.account_id}
       />
       <CreateAWithdrawTransaction
@@ -415,7 +499,9 @@ const AccountDetailsPage = () => {
       />
       <CreateCoinWithdrawTransaction
         openCoinWithdrawTransactionModal={openCoinWithdrawTransactionModal}
-        setOpenCoinWithdrawTransactionModal={setOpenCoinWithdrawTransactionModal}
+        setOpenCoinWithdrawTransactionModal={
+          setOpenCoinWithdrawTransactionModal
+        }
         accountId={accountDetails.account_id}
         refetch={refetch}
         coinBalance={accountDetails.coins}

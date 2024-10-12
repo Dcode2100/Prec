@@ -59,10 +59,6 @@ const TransferHoldingModal: React.FC<TransferHoldingModalProps> = ({
   const { data: accountsData, isLoading: isSearchLoading } = useQuery({
     queryKey: ['accounts', searchTerm],
     queryFn: fetchAccounts,
-    // {
-    //   enabled: searchTerm.length > 2,
-    //   cacheTime: 0,
-    // }
   })
 
   const debouncedSearch = useCallback(

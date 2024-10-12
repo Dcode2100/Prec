@@ -3,9 +3,8 @@ import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import moment from 'moment'
-import { AccountTable } from '@/components/accountTable/AccountTable'
+import AccountTable from '@/components/accountTable/AccountTable'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -13,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useToast } from '@/hooks/use-toast'
 import { getPCOrders, getPCOrdersByAccountId } from '@/lib/api/ordersApi'
 import { CSVLink } from 'react-csv'
 import {
@@ -48,7 +46,6 @@ const PCOrdersTable = (): React.ReactElement => {
   const { slug } = useParams()
   const slugString = Array.isArray(slug) ? slug[0] : slug
   const parts = slugString.split('-')
-  const type = parts[0]
   const accountId = parts.slice(1).join('-')
 
   const [selectedOrder, setSelectedOrder] = useState<string | undefined>()
@@ -60,7 +57,7 @@ const PCOrdersTable = (): React.ReactElement => {
   const [search, setSearch] = useState('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [dataUpdate, setDataUpdate] = useState(false)
-  const { toast } = useToast()
+
 
   const pcOrderStatus = {
     All: 'All',
@@ -133,7 +130,7 @@ const PCOrdersTable = (): React.ReactElement => {
     setPage(1)
   }
 
-  const handleRowClick = (row: any) => {
+  const handleRowClick = (row: { id: string }) => {
     setSelectedOrder(row.id)
   }
 

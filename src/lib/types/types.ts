@@ -1,4 +1,3 @@
-/* eslint-disable */
 import moment from 'moment'
 
 type EnumDictionary<T extends string | number, U> = {
@@ -7,7 +6,9 @@ type EnumDictionary<T extends string | number, U> = {
 
 // Used to map 'arbitrary' responses
 // eslint-disable-next-line
-export type Generic = { [key: string]: any }
+export interface Generic {
+  [key: string]: string | number | boolean | null | undefined
+}
 
 /*
  * TYPES
@@ -35,8 +36,8 @@ interface KeyValue {
   [index: string]: number | string
 }
 
-export interface GenericResponse<T = any> {
-  AROH: any
+export interface GenericResponse<T = Record<string, unknown>> {
+  AROH: Record<string, unknown>
   data: T
 }
 
@@ -87,8 +88,8 @@ interface Identity {
   tax_id_type?: string
   total_net_worth_max?: string
   total_net_worth_min?: string
-  extra: KeyValue
-  bo_id: [string]
+  extra: Record<string, string | number>
+  bo_id: string[]
 }
 
 export interface TrustedContact {
@@ -115,8 +116,8 @@ export enum AccountStatus {
   PENDING = 'PENDING',
   ACTIVE = 'ACTIVE',
   COMPLETE = 'COMPLETE',
-  PC_ACTIVE = "PC_ACTIVE",
-  PC_INACTIVE = "PC_INACTIVE"
+  PC_ACTIVE = 'PC_ACTIVE',
+  PC_INACTIVE = 'PC_INACTIVE',
 }
 
 export enum WaitStatus {
@@ -125,7 +126,8 @@ export enum WaitStatus {
 }
 
 export interface NominatorAccounts {
-  accounts: Account[]
+  accounts: NominatorAccountResponse[]
+  nominatorName: string
   total: number
 }
 
@@ -143,10 +145,10 @@ export interface Account {
   user_funds?: PeFundsDataInterface
   aroh_user_funds?: ArohFundsDataInterface
   address: string
-  nominator?: any
+  nominator?: NominatorResponse
   name?: string
-  bank_details?: any
-  upi_details?: any
+  bank_details?: BankDetail[]
+  upi_details?: UpiDetails
   account_number: string
   branch: string
   ifsc: string
@@ -172,6 +174,11 @@ export interface Account {
   updated_at: moment.Moment
 }
 
+export interface UpiDetails {
+  upi_id: string
+  status: string
+}
+
 export interface Referral {
   id: string
   code: string
@@ -181,8 +188,8 @@ export interface Referral {
 }
 
 export interface WalletDetails {
-  vendor_name: String
-  provider_name: String
+  vendor_name: string
+  provider_name: string
   migrated: boolean
   acknowledged: boolean
   acknowledged_at: moment.Moment
@@ -359,8 +366,8 @@ export interface OrdersParams {
   qtyEnd?: number
   status?: string
   search?: string | undefined
-  data?: any
-  orders?: any
+  data?: Record<string, unknown>
+  orders?: OrderResponse[]
   token?: string
 }
 
@@ -384,8 +391,8 @@ export interface ReportsParams {
   qtyEnd?: number
   status?: string
   search?: string | undefined
-  data?: any
-  orders?: any
+  data?: Record<string, unknown>
+  orders?: OrderResponse[]
   token?: string
 }
 
@@ -402,8 +409,8 @@ export interface BlogsParams {
   qtyEnd?: number
   status?: string
   search?: string | undefined
-  data?: any
-  orders?: any
+  data?: Record<string, unknown>
+  orders?: OrderResponse[]
   token?: string
 }
 
@@ -420,8 +427,8 @@ export interface NewsParams {
   qtyEnd?: number
   status?: string
   search?: string | undefined
-  data?: any
-  orders?: any
+  data?: Record<string, unknown>
+  orders?: OrderResponse[]
   token?: string
 }
 
@@ -448,8 +455,8 @@ export interface OrdersPara {
   qtyEnd?: number
   status?: string
   search?: string | undefined
-  data?: any
-  orders?: any
+  data?: Record<string, unknown>
+  orders?: OrderResponse[]
   token?: string
 }
 
@@ -539,7 +546,7 @@ export interface WishlistsParams {
   token?: string
   total?: number
   search?: string
-  asset_id?: number[]
+  asset_id?: string[]
   createdAfter?: string
   createdBefore?: string
 }
@@ -552,6 +559,9 @@ export interface LamfParams {
 export interface NominatorsParams {
   page?: number
   limit?: number
+  search?: string
+  createdAfter?: string
+  createdBefore?: string
 }
 
 export interface AccountsParams {
@@ -693,8 +703,8 @@ export interface NominatorResponse {
   code: string
   status: boolean
   accounts: string
-  created_at: string
-  onclick: (a: string) => void
+  created_at?: string
+  updated_at?: string
 }
 
 export interface AccountResponse {
@@ -711,17 +721,17 @@ export interface AccountResponse {
   type?: string
   gui_account_id: string
   nominator_id?: string
-  nominator?: any
+  nominator?: NominatorResponse
   registered: string
-  PE: any[]
+  PE: PEOrderType[]
   code: string
   onboarding_tracker: string
-  referral?: any
+  referral?: Referral
   wallet_balance?: string
   withdraw_balance?: string
   evaluation_expiry_date?: string
-  pe_holdings?: any
-  pc_holdings?: any
+  pe_holdings?: HoldingsResponse[]
+  pc_holdings?: AccountWisePcHoldingData[]
   total_pe_holdings_value: string
   total_pc_holdings_value: string
 }
@@ -731,16 +741,16 @@ export interface CoinTransactionResponse {
   gui_transaction_id: string
   account_id: string
   gui_account_id: string
-  referee_account_id: any
-  referrer_account_id: any
+  referee_account_id: string | null
+  referrer_account_id: string | null
   referee_order_id: string
-  order_id: any
+  order_id: string | null
   coins: number
   direction: string
   status: string
   reward_type: string
   description: string
-  note: any
+  note: string | null
   created_at: string
   updated_at: string
   mobile: string
@@ -753,58 +763,23 @@ export interface PennyDropTransactionResponse {
   transaction_id: string
   vendor_transaction_id: string
   account_id: string
-  account_number: any
-  beneficiary_name: any
+  account_number: string
+  beneficiary_name: string
   payment_type: string
   transaction_type: string
   status: string
   payee_account_number: string
   payee_account_ifsc: string
-  decentro_transaction_id: any
+  decentro_transaction_id: string
   reason: string
   reference_id: string
-  bank_reference_number: any
-  timestamp: any
+  bank_reference_number: string
+  timestamp: string
   created_at: string
   updated_at: string
   email: string
   mobile: string
   gui_account_id: string
-}
-
-export interface NominatorAccountResponse {
-  accounts: any[]
-  account_id: string
-  created_at: string
-  updated_at: string
-  mobile: string
-  email: string
-  name: string
-  orders_count: string
-  first_name: string
-  last_name: string
-  status: AccountStatus
-  type?: string
-  gui_account_id: string
-  nominator_id?: string
-  nominator?: any
-  registered: string
-  PE: any[]
-  code: string
-  onboarding_tracker: string
-  referral?: any
-  wallet_balance?: string
-  account_balance?: string
-  withdraw_balance?: string
-  order_value?: string
-  transaction_fee?: string
-  stamp_duty?: string
-  holdings_count?: string
-  holding_value?: string
-  pe_holdings?: any
-  pc_holdings?: any
-  total_pe_holdings_value: string
-  total_pc_holdings_value: string
 }
 
 export interface NominatorAccountResponse {
@@ -900,7 +875,7 @@ export interface HoldingsDataInterface {
   marketLot: number
   aprQty: number
   transactionId?: string
-  exchangeScript?: any
+  exchangeScript?: string
 }
 
 export interface GetAccountPositionsResponse {
@@ -934,10 +909,12 @@ export interface OrderDetailResponse {
   total: number
   status: string | null
   PE: any[]
-  data: arohData
+  data: OrderDetailResponse
 }
 
 export interface OrderResponse {
+  id: string
+  gui_id: string
   account_id: string
   gui_account_id: string
   gui_order_id: string
@@ -950,12 +927,12 @@ export interface OrderResponse {
   total: number
   status: string
   type?: string
-  PE?: any[]
+  PE?: PEOrderType[]
   first_name: string
   last_name: string
-  data: any
+  data: OrderDetailResponse
   gui_transaction_id: string
-  orders: any
+  orders: OrderResponse[]
   price?: string
   name_as_per_pan?: string
   email: string
@@ -1015,9 +992,9 @@ export interface ArohResponse {
   type?: string
   first_name: string
   last_name: string
-  data: any
+  data: OrderDetailResponse
   gui_transaction_id: string
-  aroh: any
+  aroh: ArohOrderStatus[]
 }
 
 export interface HoldingsResponse {
@@ -1195,8 +1172,7 @@ export interface TransactionListObj {
   updated_at: string
   gui_transaction_id: string
   gui_account_id: string
-  data: any
-  // mocking-------------
+  data: Record<string, unknown>
 }
 
 export interface WalletTransactionListObj {
@@ -1208,40 +1184,40 @@ export interface WalletTransactionListObj {
   wallet_id: string
   gui_wallet_transaction_id: string
   order_id: string
-  amount: any
-  charges_gst: any
-  settled_amount: any
+  amount: number
+  charges_gst: number | null
+  settled_amount: number | null
   account_balance: string
   transaction_amount: string
   transaction_type: string
   status: string
   payment_type: string
   reference_number: string
-  reference_id: any
+  reference_id: string | null
   credit_debit: string
   bene_account_number: string
   bene_account_ifsc: string
-  va_settler_id: any
-  upi_id: any
-  upi_transaction_id: any
-  vendor_order_id: any
-  upi_payer_name: any
-  upi_payer_mobile: any
+  va_settler_id: string | null
+  upi_id: string | null
+  upi_transaction_id: string | null
+  vendor_order_id: string | null
+  upi_payer_name: string | null
+  upi_payer_mobile: string | null
   sender_account_number: string
   sender_account_ifsc: string
-  rmtr_full_name: any
-  rmtr_account_no: any
-  rmtr_account_ifsc: any
+  rmtr_full_name: string | null
+  rmtr_account_no: string | null
+  rmtr_account_ifsc: string | null
   reason: string
   withdraw_amount: number
   created_at: string
   updated_at: string
   transaction_time: string
   user_transaction_type: string
-  provider_code: any
+  provider_code: string | null
   portal: string
   note: string
-  credited_at: any
+  credited_at: string | null
   wallet: Wallet
   credit_amount: number
   debit_amount: number
@@ -1449,7 +1425,7 @@ export interface AnalyticsDataResponse {
   transferPendingOrderCount: number
   dispatchedOrderCount: number
   recentOrders: { orders: orderDetails[]; total: number }
-  recentTransactions: any
+  recentTransactions: TransactionListObj[]
   sharesTransferPendingCount: number
   sharesTransferFailedCount: number
   recentTransferFailedOrders: { orders: orderDetails[]; total: number }
@@ -1458,24 +1434,66 @@ export interface AnalyticsDataResponse {
     total: number
   }
   recentTransferPendingOrders: { orders: orderDetails[]; total: number }
-  verificationPendingOrders: any
+  verificationPendingOrders: OrderResponse[]
   didNotLinkDemat: number
   linkedDemat: number
   linkedBank: number
   didNotAddBank: number
-  arohUsers: arohData
+  arohUsers: ArohData
   verificationPendingOrdersCount: number
   nsePaidOrdersCount: number
   total_order_value: number
   average_order_value: number
 }
 
-export interface arohData {
+export interface ArohData {
   didNotClickPayNow: number
   didNotUploadAadhaar: number
   didNotUploadPan: number
   didNotSignConsentLetter: number
-  AROH: any[]
+  AROH: ArohOrderStatus[]
+}
+export type PEOrderType = {
+  account_id: string
+  gui_account_id: string
+  order_id: string
+  gui_order_id: string
+  side: 'Buy' | 'Sell'
+  quantity: number
+  lots: number
+  price_per_lot: string
+  symbol: string
+  total: string
+  status: string
+  created_at: string
+  payment_date: string
+  transfer_success_date: string
+  firstName: string
+  lastName: string
+  mobile: string
+  email: string
+}
+
+export type PEAccountType = {
+  account_id: string
+  gui_account_id: string
+  email: string
+  mobile: string
+  firstName: string
+  lastName: string
+  status: string
+  nominator: string | null
+  orders_count: number
+  whatsapp_notification: boolean
+  created_at: string
+  evaluationExpiryDate: string
+  onBoardingTracker: string
+  active: boolean
+}
+
+export type OrderAnalyticsByStatus = {
+  total: number
+  PE: PEOrderType[] | PEAccountType[]
 }
 
 export interface UserAnalyticsDataResponse {
@@ -1486,11 +1504,11 @@ export interface UserAnalyticsDataResponse {
   didNotAgreeToDisclaimer: number
   totalWaitlistUsersCount: number
   pendingWaitlistUsersCount: number
-  recentPeSignups: any
-  account: any[]
-  recentWaitlists: any
-  waitlists: any[]
-  data: any
+  recentPeSignups: Record<string, unknown>[]
+  account: Record<string, unknown>[]
+  recentWaitlists: Record<string, unknown>[]
+  waitlists: Record<string, unknown>[]
+  data: Record<string, unknown>
   didNotSendAccessCodeCount: number
   sentAccessCodeCount: number
 }
@@ -1529,7 +1547,7 @@ export interface GetOrderByIdResponse {
   message: string
   data: {
     type: string
-    data: any
+    data: Record<string, unknown>
   }
 }
 
@@ -1600,7 +1618,7 @@ export interface createPeAssetType {
   glanceReports: string[] | []
   fullReport: string
   financialReports: FinancialReportInterface[] | []
-  splitDetails: splitDetailsInterface[] | []
+  splitDetails?: splitDetailsInterface[] | []
   logo: string
   logoMark: string
   mobileLogo: string
@@ -1707,7 +1725,7 @@ export interface createPcAssetType {
   tentative_end_date: string
   trade_start_date: string
   trade_end_date: string
-  repaid_date: any
+  repaid_date: string
   tenure: number
   tentative_tenure: number
   available_quantity: number
@@ -1746,7 +1764,7 @@ export interface PcAsset {
   tentative_end_date: string
   trade_start_date: string
   trade_end_date: string
-  repaid_date: any
+  repaid_date: string
   tenure: number
   tentative_tenure: number
   available_quantity: number
@@ -1897,16 +1915,16 @@ export interface OrderDetail {
   transactionFee: string
   status: string
   reason: string
-  payment_id: any
+  payment_id: string | null
   bo_id: string
-  upi: any
+  upi: string | null
   ses_details: SesDetails
   created_at: string
   updated_at: string
   payment_date: string
   transfer_success_date: string
   paid_by: string
-  note: any
+  note: string | null
   account_id: string
   email: string
   mobile: string
@@ -1935,7 +1953,7 @@ export interface UsersPanPendingResponse {
   wallet_balance: string
   withdraw_balance: string
   evaluation_expiry_date: string
-  pan_updated_at: any
+  pan_updated_at: string
   created_at: string
   updated_at: string
 }
@@ -1974,13 +1992,17 @@ export interface HoldingsData {
 }
 
 export interface BlogsData {
-  map(arg0: (el: any, idx: any) => any): unknown
+  map(
+    arg0: (el: BlogResponse, idx: number) => React.ReactNode
+  ): React.ReactNode[]
   blogs: BlogResponse[]
   total: number
 }
 
 export interface NewsData {
-  map(arg0: (el: any, idx: any) => any): unknown
+  map(
+    arg0: (el: NewsResponse, idx: number) => React.ReactNode
+  ): React.ReactNode[]
   blogs: NewsResponse[]
   total: number
 }
@@ -2122,83 +2144,6 @@ export interface ConfigData {
   value: string
 }
 
-export interface GetAllWebhooks {
-  message: string
-  data: GetAllWebhooksData
-}
-
-export interface GetAllWebhooksData {
-  webhooksResponse: WebhooksResponse[]
-  total: number
-}
-
-export interface WebhooksResponse {
-  webhook_reponse_id: string
-  vendor_transaction_id: string
-  vendor_order_id: any
-  vendor_va_id: string
-  bank_reference_number: string
-  account_number: any
-  reference_id: any
-  balance: string
-  amount: string
-  status: string
-  precize_status: string
-  direction: string
-  transfer_type: string
-  transaction_type: string
-  beneficiary_name: any
-  payee_account_number: any
-  payee_account_ifsc: any
-  payer_vpa?: string
-  payer_account_ifsc: string
-  payer_account_number?: string
-  payer_mobile_number: any
-  payer_name: string
-  va_name: string
-  account_holder_name: any
-  transaction_message: string
-  provider_code: string
-  is_virtual_account: boolean
-  callback_transaction_id: any
-  original_callback_transaction_id: any
-  note: string
-  precize_reason: string
-  vendor_event: any
-  response: ResponseData
-  timestamp: string
-  vendor_name: string
-  provider_name: string
-  count: number
-  created_at: string
-  updated_at: string
-}
-
-export interface ResponseData {
-  utr: string
-  note: string
-  type: string
-  amount: number
-  vaName: string
-  SubVaId: string
-  createdAt: string
-  settle_to: string
-  created_by: string
-  trx_status: string
-  yetToSettle: string
-  payment_mode: string
-  remiter_ifsc: string
-  remiter_name: string
-  payment_remark: string
-  transcation_id: string
-  closing_balance: string
-  isVirtualAccount: boolean
-  transaction_type: string
-  settlement_Amount: string
-  SubVaAccountNumber: string
-  remiter_account_number: string
-}
-
 export interface DailyWalletResponseBalance {
   statusCode: number
   message: string
@@ -2241,7 +2186,7 @@ export interface AllWalletData {
   updated_at: string
   migrated: boolean
   acknowledged: boolean
-  acknowledgedAt: any
+  acknowledgedAt: string
   bankDetails: BankDetail[]
   walletDetails: WalletDetail[]
   total: number
@@ -2265,7 +2210,7 @@ export interface WalletDetail {
   ifsc_code: string
   settle_to: string
   whitelist_remitters: WhitelistRemitter[]
-  parent_id: any
+  parent_id: string
   parent_type: string
   created_at: string
   updated_at: string
@@ -2276,7 +2221,7 @@ export interface WalletDetail {
   seller_account_balance: string
   seller_withdraw_amount: string
   link_upi: boolean
-  upi_details: any
+  upi_details: string
   va_lien_amount: number
   vendor_name: string
   provider_name: string
@@ -2428,8 +2373,8 @@ export interface GetAccountWalletTransactionsbyIdDataTransactions {
   wallet_transaction_id: string
   vendor_wallet_transaction_id: string
   vendor_wallet_id: string
-  vendor_transaction_id: any
-  decentro_transaction_id: any
+  vendor_transaction_id: string | null
+  decentro_transaction_id: string | null
   account_id: string
   wallet_id: string
   gui_wallet_transaction_id: string
@@ -2444,37 +2389,37 @@ export interface GetAccountWalletTransactionsbyIdDataTransactions {
   vendor_status: string
   precize_transaction_type: string
   payment_type: string
-  reference_number: any
+  reference_number: string | null
   reference_id: string
   credit_debit: string
   bene_account_number: string
   bene_account_ifsc: string
-  bene_code: any
+  bene_code: string | null
   bene_account_type: number
-  va_settler_id: any
-  upi_id: any
-  upi_transaction_id: any
-  vendor_order_id: any
-  upi_payer_name: any
-  upi_payer_mobile: any
+  va_settler_id: string | null
+  upi_id: string | null
+  upi_transaction_id: string | null
+  vendor_order_id: string | null
+  upi_payer_name: string | null
+  upi_payer_mobile: string | null
   sender_account_number: string
   sender_account_ifsc: string
-  rmtr_full_name: any
-  rmtr_account_no: any
-  rmtr_account_ifsc: any
-  reason: any
+  rmtr_full_name: string | null
+  rmtr_account_no: string | null
+  rmtr_account_ifsc: string | null
+  reason: string | null
   withdraw_amount: string
   created_by: string
   created_at: string
   updated_at: string
-  transaction_time: any
+  transaction_time: string
   user_transaction_type: string
   vendor_name: string
   provider_name: string
-  provider_code: any
+  provider_code: string | null
   portal: string
   note: string
-  credited_at: any
+  credited_at: string | null
   upi_links?: UpiLinks
   wallet: Wallet
 }
@@ -2489,92 +2434,7 @@ export interface User {
   mobile: string
 }
 
-export interface DashboardUsersResponse {
-  dashboard_users: DashboardUser[]
-  total: number
-  limit: number
-  page: number
-}
-
-export interface DashboardUser {
-  account_id: string
-  role_id: string
-  partner_key: string
-  aws_account_id: string
-  first_name: string
-  last_name: string
-  phone: string
-  email: any
-  verified: boolean
-  platform: string
-  created_at: string
-  last_logged_in_at: string
-  updated_at: string
-  type: string
-}
-
 export interface LogoutResponse extends Omit<Root, 'data'> {}
-
-export interface DashboardUserEventsResponseData {
-  events: DashboardUserEvent[]
-  filters: any
-  total: number
-  page: number
-  limit: number
-}
-
-export interface DashboardUserEventsResponse extends Omit<Root, 'data'> {
-  data: DashboardUserEventsResponseData
-}
-
-export interface DashboardUserEvent {
-  id: string
-  account_id: string
-  action: string
-  phone: string
-  first_name: string
-  last_name: string
-  device_info: DeviceInfo
-  ip_address: string
-  login: boolean
-  created_at: string
-  updated_at: string
-}
-
-export interface DashboardUserAction {
-  label: string
-  value: string
-  count: number
-}
-
-export interface DeviceInfo {
-  os: Os
-  ua: string
-  device: Device
-  engine: Engine
-  browser: Browser
-}
-
-export interface Os {
-  name: string
-  version: string
-}
-
-export interface Device {
-  model: string
-  vendor: string
-}
-
-export interface Engine {
-  name: string
-  version: string
-}
-
-export interface Browser {
-  name: string
-  major: string
-  version: string
-}
 
 export interface ActivateMfaResponse extends Omit<Root, 'data'> {
   data: ActivateMfaData
@@ -2592,67 +2452,6 @@ export interface VerifyMfaResponse extends Omit<Root, 'data'> {
 export interface VerifyMfaData {
   account_id: string
   mfa_active: boolean
-}
-
-export interface PermissionRolesResponse {
-  roles: PermissionRole[]
-  total: number
-  limit: number
-  page: number
-}
-
-export interface PermissionRole {
-  id: string
-  name: string
-  dashboard: boolean
-  accounts: boolean
-  manager: boolean
-  journey: boolean
-  orders: boolean
-  transactions: boolean
-  accounting: boolean
-  reports: boolean
-  cms: boolean
-  config: boolean
-  users: boolean
-  roles: boolean
-  access: number
-  totalAccess: number
-  totalAccounts: number
-}
-
-export interface RoleAccountsResponse {
-  accounts: RoleAccounts[]
-  total: number
-  limit: number
-  page: number
-}
-
-export interface RoleAccounts {
-  id: string
-  account_id: string
-  partner_key: string
-  role_id: string
-  role: string
-  email: string
-  phone: string
-  user_name: string
-  first_name: string
-  last_name: string
-  verified: string
-  mfa_active: string
-  type: string
-  plateform: string
-  delete: string
-  last_logged_in_at: string
-  created_at: string
-  updated_at: string
-}
-
-export interface DashboardUserConfigResponse {
-  type: string
-  role: string
-  permissions: PermissionRole
 }
 
 export interface GetAllDashboardCounts {
@@ -2683,25 +2482,29 @@ export interface GetAllDashboardOverview {
 }
 
 export interface AccountWiseHoldingData {
-  token: string
+  account_id: string
+  gui_account_id: string
+  holding_id: string
   asset_id: string
+  token: string
   symbol: string
-  company_pan: string
+  company_pan: string | null
   quantity: number
   price: string
   amount: string
-  buy_quantity: number
-  buy_amount: string
+  buy_transaction_fees: string
   sell_quantity: number
   sell_price: string
   sell_amount: string
-  sold: boolean
-  curr_price: string
-  curr_value: string
-  pnl: string
-  pnl_percentage: string
-  buy_transaction_fees: string
   sell_transaction_fees: string
+  sold: boolean
+  created_at: string
+  updated_at: string
+  email: string
+  first_name: string
+  middle_name: string
+  last_name: string
+  mobile: string
 }
 
 export interface AccountWisePcHoldingData {
@@ -2745,4 +2548,27 @@ export interface TransferHoldingResponse {
   data: {
     transferredHoldings: string[]
   }
+}
+
+export interface CoinTransactionResponse {
+  transaction_id: string
+  gui_transaction_id: string
+  account_id: string
+  gui_account_id: string
+  referee_account_id: string | null
+  referrer_account_id: string | null
+  referee_order_id: string
+  order_id: string | null
+  coins: number
+  direction: string
+  status: string
+  reward_type: string
+  description: string
+  note: string | null
+  created_at: string
+  updated_at: string
+  mobile: string
+  first_name: string
+  last_name: string
+  email: string
 }

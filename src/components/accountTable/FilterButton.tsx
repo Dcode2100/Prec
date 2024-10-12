@@ -7,18 +7,18 @@ import { getNumberInRupee } from "@/utils/utils";
 import numeral from "numeral";
 
 interface FilterButtonProps {
-  filterPills: Generic;
+  filterPills?: Generic;
   openFilter: () => void;
   removeFilter: (filter: string) => void;
   className?: string;
 }
 
-const FilterButton = ({ filterPills, openFilter, removeFilter, className }: FilterButtonProps): React.ReactElement => {
+const FilterButton = (p0: string, { filterPills, openFilter, removeFilter, className }: FilterButtonProps): React.ReactElement => {
   return (
     <div className={`flex items-center ${className || ''}`}>
       <div className="flex flex-wrap gap-2 flex-grow">
-        {Object.entries(filterPills)
-          .filter(([_, value]) => value && value.toLowerCase() !== "all")
+        {Object.entries(filterPills || {})
+          .filter(([_, value]) => value && value !== "all")
           .map(([key, value]) => (
             <Badge key={key} variant="secondary" className="pl-2 pr-1 py-1">
               {value}

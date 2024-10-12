@@ -1,14 +1,25 @@
-import { GetAllPCHoldingsData } from '../types/getAllPCHoldingsType'
+import { PcHolding } from '../types/getAllPCHoldingsType'
 import {
+  AccountWiseHoldingData,
+  OrdersParams,
   TransactionsParams,
   TransferHoldingParams,
   UpdateHolding,
 } from '../types/types'
 import axiosInstance, { setInstance } from './axiosInstance'
 
+export const getAllHoldings = async (
+  params: OrdersParams
+): Promise<{ PE: AccountWiseHoldingData[]; total: number }> => {
+  const response = await axiosInstance.get(`/dashboard/holdings/`, {
+    params,
+  })
+  return response?.data?.data
+}
+
 export const getAllPcHoldings = async (
   params: TransactionsParams
-): Promise<GetAllPCHoldingsData> => {
+): Promise<{ holdings: PcHolding[]; total: number }> => {
   const response = await axiosInstance.get(`/dashboard/pc/holdings`, {
     params,
   })

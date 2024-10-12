@@ -80,7 +80,7 @@ const PCOrderDetails: React.FC<PCOrderDetailsProps> = ({
     })
   }
 
-  const DetailRow = ({ label, value, copyable = false }) => (
+  const DetailRow = ({ label, value, copyable = false }: { label: string, value: string, copyable?: boolean }) => (
     <div className="py-1 flex justify-between items-center">
       <Label className="text-sm text-muted-foreground">{label}</Label>
       <div className="flex items-center">

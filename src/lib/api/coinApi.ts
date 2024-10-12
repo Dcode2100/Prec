@@ -1,10 +1,9 @@
 import axiosInstance from '@/lib/api/axiosInstance'
 import { GenericResponse } from '@/lib/types'
-import { AddFundsParams, PeFundsDataInterface, TransactionsParams } from '@/lib/types/types'
-import { getGlobalItem } from '@/utils/utils'
+import { TransactionsParams } from '@/lib/types/types'
 import { Data, Pe, WalletTransactionsResponse } from '../types/walletType'
 
-export const manualCoinTransfer = async (coins: any, accountId: string) => {
+export const manualCoinTransfer = async (coins: number, accountId: string) => {
   const res = await axiosInstance.post(
     `/dashboard/coins/accounts/${accountId}`,
     {
@@ -36,9 +35,9 @@ export const manualCoinWithdraw = async ({
 export const getCoinTransactionsById = async (
   accountId: string,
   type: string,
-  params: any
+  params: TransactionsParams
 ) => {
-  const res = await axiosInstance.get<GenericResponse<any>>(
+  const res = await axiosInstance.get<GenericResponse>(
     `/dashboard/coins/PE/accounts/${accountId}`,
     {
       params,

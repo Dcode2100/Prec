@@ -92,10 +92,10 @@ export const getAccountHoldings = async (accountId: string, type: string) => {
   const isAffiliate = getGlobalItem('isAffiliate')
 
   const res = isAffiliate
-    ? await axiosInstance.get<GenericResponse<any>>(
+    ? await axiosInstance.get<GenericResponse<AccountHoldingsResponse>>(
         `/dashboard/nominatorDashboard/accounts/${type}/${accountId}/holdings`
       )
-    : await axiosInstance.get<GenericResponse<any>>(
+    : await axiosInstance.get<GenericResponse<AccountHoldingsResponse>>(
         `/dashboard/accounts/${type}/${accountId}/holdings`
       )
 
@@ -105,17 +105,17 @@ export const getAccountHoldings = async (accountId: string, type: string) => {
 export const getAccountWishlist = async (
   accountId: string,
   type: string,
-  params?: any
+  params?: WishlistParams
 ) => {
   const isAffiliate = getGlobalItem('isAffiliate')
   const res = isAffiliate
-    ? await axiosInstance.get<GenericResponse<any>>(
+    ? await axiosInstance.get<GenericResponse<AccountWishlistResponse>>(
         `/dashboard/nominatorDashboard/accounts/${type}/${accountId}/wishlists`,
         {
           params,
         }
       )
-    : await axiosInstance.get<GenericResponse<any>>(
+    : await axiosInstance.get<GenericResponse<AccountWishlistResponse>>(
         `/dashboard/accounts/${type}/${accountId}/wishlists`,
         {
           params,
@@ -127,11 +127,11 @@ export const getAccountWishlist = async (
 export const getAccountReferral = async (accountId: string, type: string) => {
   const isAffiliate = getGlobalItem('isAffiliate')
   const res = isAffiliate
-    ? await axiosInstance.get<GenericResponse<any>>(
+    ? await axiosInstance.get<GenericResponse<AccountReferralResponse>>(
         `/dashboard/nominatorDashboard/accounts/${accountId}/referrals`,
         { params: { page: 1, limit: 100 } }
       )
-    : await axiosInstance.get<GenericResponse<any>>(
+    : await axiosInstance.get<GenericResponse<AccountReferralResponse>>(
         `/dashboard/accounts/${accountId}/referrals`,
         { params: { page: 1, limit: 100 } }
       )
@@ -145,13 +145,13 @@ export const getAccountWalletTransactions = async (
 ) => {
   const isAffiliate = getGlobalItem('isAffiliate')
   const res = isAffiliate
-    ? await axiosInstance.get<GenericResponse<any>>(
+    ? await axiosInstance.get<GenericResponse<WalletTransactionsResponse>>(
         `/dashboard/nominatorDashboard/accounts/${accountId}/walletTransactions`,
         {
           params,
         }
       )
-    : await axiosInstance.get<GenericResponse<any>>(
+    : await axiosInstance.get<GenericResponse<WalletTransactionsResponse>>(
         `/dashboard/accounts/${accountId}/walletTransactions`,
         {
           params,
@@ -235,3 +235,59 @@ export const createVirtualAccount = async (accountId: string): Promise<any> => {
     await axiosInstance.post(`/dashboard/accounts/${accountId}/wallet`);
   return createWalletResponse?.data;
 };
+
+// New interfaces
+interface AccountHoldingsResponse {
+  holdings: AccountHolding[]
+}
+
+interface AccountHolding {
+  holding_id: string
+  token: string
+  symbol: string
+  quantity: number
+  price: string
+  amount: string
+}
+
+interface WishlistParams {
+  page?: number
+  limit?: number
+}
+
+interface AccountWishlistResponse {
+  wishlists: Wishlist[]
+}
+
+interface Wishlist {
+  id: string
+  asset_id: string
+  symbol: string
+  created_at: string
+}
+
+interface AccountReferralResponse {
+  referrals: Referral[]
+  total: number
+}
+
+interface Referral {
+  id: string
+  code: string
+  account_id: string
+  referred_by: string
+  referral_limit: number
+}
+
+interface WalletTransactionsResponse {
+  transactions: WalletTransaction[]
+  total: number
+}
+
+interface WalletTransaction {
+  id: string
+  amount: string
+  status: string
+  transaction_type: string
+  created_at: string
+}

@@ -37,3 +37,22 @@ export interface BulkPeTransaction {
   created_at: string;
   updated_at: string;
 }
+
+export interface BulkPeTransactionParams {
+  limit: number
+  page: number
+  search?: string
+  dateFilterBy?: string
+  createdAfter?: string
+  createdBefore?: string
+  updatedAfter?: string
+  updatedBefore?: string
+  status?: string
+  payment_mode?: string
+  type?: string
+}
+
+export interface BulkPeTransactionResponse {
+  transactions: BulkPeTransaction[]
+  total: number
+}

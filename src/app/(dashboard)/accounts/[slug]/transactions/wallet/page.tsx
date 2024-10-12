@@ -3,14 +3,14 @@ import React, { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { AccountTable } from '@/components/accountTable/AccountTable'
-import { FilterDrawer } from '@/components/accountTable/FilterDrawer'
-import { FilterSelect } from '@/components/accountTable/FilterSelect'
-import { FilterRadioButtons } from '@/components/accountTable/FilterRadioButtons'
+import AccountTable from '@/components/accountTable/AccountTable'
+import FilterDrawer from '@/components/accountTable/FilterDrawer'
+import FilterSelect from '@/components/accountTable/FilterSelect'
+import { FilterRadioButtons } from '@/components/accountTable'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
 import { CSVLink } from 'react-csv'
-import moment from 'moment'
+import moment, { Moment } from 'moment'
 import {
   getAccountWalletTransactions,
   createWallet,
@@ -23,7 +23,7 @@ import {
   TransactionStatus,
   WalletTransactionListObj,
 } from '@/lib/types/types'
-import { capitalize, getNumberInRupee } from '@/lib/globals/utils'
+import { capitalize, getNumberInRupee } from '@/utils/utils'
 import dynamic from 'next/dynamic'
 
 const AccountWalletTransactionDetails = dynamic(
@@ -61,8 +61,8 @@ const WalletTable = (): React.ReactElement => {
   const [filterOpen, setFilterOpen] = useState(false)
   const [applyFilter, setApplyFilter] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>('All')
-  const [amountFilter, setAmountFilter] = useState<any>([null, null])
-  const [selectedDates, setSelectedDates] = useState<any>([null, null])
+  const [amountFilter, setAmountFilter] = useState<[number | null, number | null]>([null, null])
+  const [selectedDates, setSelectedDates] = useState<[Moment | null, Moment | null]>([null, null])
   const [dateFilterType, setDateFilterType] = useState('createdAt')
   const [isTransactionDetailsOpen, setIsTransactionDetailsOpen] =
     useState(false)
@@ -107,23 +107,23 @@ const WalletTable = (): React.ReactElement => {
     refetchInterval: 0,
   })
 
-  const handleCreateWallet = async (account: any) => {
-    try {
-      const response = await createWallet(account.account_id)
-      // getAccountRefetch();
-      if (response.statusCode === 201) {
-        toast({
-          description: response.message,
-          variant: 'default',
-        })
-      }
-    } catch (err) {
-      toast({
-        description: 'Failed to create wallet',
-        variant: 'destructive',
-      })
-    }
-  }
+  // const handleCreateWallet = async (account) => {
+  //   try {
+  //     const response = await createWallet(account.account_id)
+  //     // getAccountRefetch();
+  //     if (response.statusCode === 201) {
+  //       toast({
+  //         description: response.message,
+  //         variant: 'default',
+  //       })
+  //     }
+  //   } catch (err) {
+  //     toast({
+  //       description: 'Failed to create wallet',
+  //       variant: 'destructive',
+  //     })
+  //   }
+  // }
 
   const initializeWalletTransferfn = async (
     accountId: string,
@@ -186,17 +186,17 @@ const WalletTable = (): React.ReactElement => {
     {
       header: 'Amount',
       accessorKey: 'transaction_amount',
-      cell: (value: any) => getNumberInRupee(value, true),
+      cell: (value: { getValue: () => number }) => getNumberInRupee(value.getValue(), true),
     },
     {
       header: 'Fees',
       accessorKey: 'charges_gst',
-      cell: (value: any) => getNumberInRupee(value, true),
+      cell: (value: { getValue: () => number }) => getNumberInRupee(value.getValue(), true),
     },
     {
       header: 'Settled Amt',
       accessorKey: 'settled_amount',
-      cell: (value: any) => getNumberInRupee(value, true),
+      cell: (value: { getValue: () => number }) => getNumberInRupee(value.getValue(), true),
     },
     {
       header: 'Payment Type',
@@ -209,7 +209,7 @@ const WalletTable = (): React.ReactElement => {
     {
       header: 'Status',
       accessorKey: 'status',
-      cell: (value: any) => capitalize(value?.split('_').join(' ') || ''),
+      cell: (value: { getValue: () => string }) => capitalize(value.getValue()?.split('_').join(' ') || ''),
     },
     {
       header: 'Type',
@@ -218,13 +218,13 @@ const WalletTable = (): React.ReactElement => {
     {
       header: 'Trade Time',
       accessorKey: 'created_at',
-      cell: (value: any) => moment(value).format('YYYY-MM-DD HH:mm:ss'),
+      cell: (value: { getValue: () => string }) => moment(value.getValue()).format('YYYY-MM-DD HH:mm:ss'),
     },
   ]
 
   const exportData = useMemo(
     () =>
-      accountWalletQuery.data?.PE?.map((row: any) => ({
+      accountWalletQuery.data?.PE?.map((row: WalletTransactionListObj) => ({
         ...row,
         created_at: moment(row?.created_at).format('YYYY-MM-DD HH:mm:ss'),
         updated_at: moment(row?.updated_at).format('YYYY-MM-DD HH:mm:ss'),
@@ -294,7 +294,7 @@ const WalletTable = (): React.ReactElement => {
           )}.csv`}
           headers={exportHeaders}
         >
-          <Button>Export</Button>
+          <Button className="h-8">Export</Button>
         </CSVLink>
         <Button onClick={() => setFilterOpen(true)}>Filter</Button>
       </div>

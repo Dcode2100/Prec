@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { OrdersParams, WaitlistResponse } from '@/lib/types/types'
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 
 import { DataTable } from '../components/table/data-table'
 import { ColumnDef } from '@tanstack/react-table'
@@ -61,6 +61,7 @@ const ActionButton = ({ row }: { row: WaitlistResponse }) => {
 }
 const Acquisition = () => {
   const params = useParams()
+  const searchParams = useSearchParams()
   const [pagination, setPagination] = useState({
     common: { limit: 10, page: 1 },
   })
@@ -69,9 +70,13 @@ const Acquisition = () => {
   const [dateFilter, setDateFilter] = useState<{
     startDate: Moment | null
     endDate: Moment | null
-  }>({
-    startDate: null,
-    endDate: null,
+  }>(() => {
+    const startDate = searchParams.get('startDate')
+    const endDate = searchParams.get('endDate')
+    return {
+      startDate: startDate ? moment(startDate) : null,
+      endDate: endDate ? moment(endDate) : null,
+    }
   })
 
   const getFilteredData = () => {

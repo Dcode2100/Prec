@@ -1,18 +1,17 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { AccountTable } from '@/components/AccountTable'
+import { AccountTable } from '@/components/accountTable'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CSVLink } from 'react-csv'
 import moment from 'moment'
-import FilterButton from '@/components/accountTable/FilterButton'
-import { FilterDrawer } from '@/components/accountTable/FilterDrawer'
-import { FilterSelect } from '@/components/accountTable/FilterSelect'
-import { FilterDateSelect } from '@/components/accountTable/FilterDateSelect'
-import { FilterRadioButtons } from '@/components/accountTable/FilterRadioButtons'
+import FilterDrawer from '@/components/accountTable/FilterDrawer'
+import FilterSelect from '@/components/accountTable/FilterSelect'
+// import { FilterDateSelect } from '@/components/accountTable/FilterDateSelect'
+import FilterRadioButtons from '@/components/accountTable/FilterRadioButtons'
 import {
   getWalletTransactions,
   getWalletTransactionsByAccountId,
@@ -20,7 +19,7 @@ import {
 import {
   WalletTransactionListObj,
   TransactionsParams,
-  TransactionStatus,
+  TransactionStatus
 } from '@/lib/types/types'
 import { capitalize, getNumberInRupee } from '@/utils/utils'
 import UploadCSV from '@/components/UploadDocument/UploadBulkCreditWalletTransaction'
@@ -28,6 +27,8 @@ import WalletTransactionDetails from '@/components/sheets/WalletTransactionDetai
 import ApproveProcessPendingDepositsModal from '@/components/modals/ApproveProcessPendingDepositsModal'
 import { approveDeposits } from '@/lib/api/fundApi'
 import { useToast } from '@/hooks/use-toast'
+import { ColumnTable } from '@/lib/types'
+import { X } from 'lucide-react'
 
 const statusOptions = [
   'All',
@@ -103,14 +104,16 @@ function CreditWalletTransactions() {
   const { slug } = useParams()
   const slugString = Array.isArray(slug) ? slug[0] : slug
   const parts = slugString.split('-')
-  const accountType = parts[0]
+  // const accountType = parts[0]
   const accountId = parts.slice(1).join('-')
   const { toast } = useToast()
 
   const [selectedTab, setSelectedTab] = useState('all')
   const [filterOpen, setFilterOpen] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>('All')
-  const [selectedDates, setSelectedDates] = useState<[Date | null, Date | null]>([null, null])
+  const [selectedDates, setSelectedDates] = useState<
+    [Date | null, Date | null]
+  >([null, null])
   const [dateFilterType, setDateFilterType] = useState('createdAt')
   const [applyFilter, setApplyFilter] = useState(false)
   const [page, setPage] = useState(1)
@@ -178,7 +181,7 @@ function CreditWalletTransactions() {
 
   const transactions = data?.PE || []
 
-  const columns = [
+  const columns: ColumnTable<WalletTransactionListObj>[] = [
     {
       header: 'Transaction ID',
       accessorKey: 'gui_wallet_transaction_id',
@@ -186,6 +189,7 @@ function CreditWalletTransactions() {
     },
     {
       header: 'Account ID',
+      accessorKey: 'account_id',
       cell: () => accountId,
     },
     {
@@ -243,13 +247,13 @@ function CreditWalletTransactions() {
     {
       header: 'Action',
       accessorKey: 'action',
-      cell: (row ) => (
+      cell: (row: any) => (
         <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
           <Button
             variant="outline"
             size="sm"
             onClick={() => {
-              const transaction = transactions[row.index];
+              const transaction = transactions[row.index]
               setIsLoadingAction({
                 btnId: transaction.wallet_transaction_id,
                 walletTransactionId: transaction.wallet_transaction_id,
@@ -269,7 +273,7 @@ function CreditWalletTransactions() {
             variant="outline"
             size="sm"
             onClick={() => {
-              const transaction = transactions[row.index];
+              const transaction = transactions[row.index]
               rejectTransaction(
                 transaction.account_id,
                 'REJECT',
@@ -283,16 +287,6 @@ function CreditWalletTransactions() {
       ),
     },
   ]
-
-  const filterPills = {
-    status: capitalize(statusFilter),
-    dates:
-      selectedDates[0] && selectedDates[1]
-        ? `${moment(selectedDates[0]).format('DD/MM/YYYY')} - ${moment(
-            selectedDates[1]
-          ).format('DD/MM/YYYY')}`
-        : null,
-  }
 
   const removeFilter = (filterId: string) => {
     if (filterId === 'status') {
@@ -330,6 +324,14 @@ function CreditWalletTransactions() {
     }
   }
 
+  // Add this function to handle removing all filters
+  const removeAllFilters = () => {
+    setStatusFilter('All')
+    setSelectedDates([null, null])
+    setDateFilterType('createdAt')
+    setApplyFilter(false)
+  }
+
   return (
     <>
       <FilterDrawer
@@ -352,10 +354,10 @@ function CreditWalletTransactions() {
           value={dateFilterType}
           setValue={setDateFilterType}
         />
-        <FilterDateSelect
+        {/* <FilterDateSelect
           header=""
           onDateSelect={(st, ed) => setSelectedDates([st, ed])}
-        />
+        /> */}
       </FilterDrawer>
 
       <Tabs defaultValue="all" onValueChange={(value) => setSelectedTab(value)}>
@@ -379,13 +381,43 @@ function CreditWalletTransactions() {
                 Export
               </CSVLink>
             </Button>
-            <FilterButton
-              filterPills={applyFilter ? filterPills : {}}
-              openFilter={() => setFilterOpen(true)}
-              removeFilter={removeFilter}
-            />
           </div>
         </div>
+
+        {/* Add this section for active filters and remove filter button */}
+        {applyFilter && (
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-sm font-medium">Active Filters:</span>
+            {statusFilter !== 'All' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => removeFilter('status')}
+                className="text-xs"
+              >
+                Status: {statusFilter} <X className="w-3 h-3 ml-1" />
+              </Button>
+            )}
+            {selectedDates[0] && selectedDates[1] && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => removeFilter('dates')}
+                className="text-xs"
+              >
+                Date: {dateFilterType} <X className="w-3 h-3 ml-1" />
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={removeAllFilters}
+              className="text-xs"
+            >
+              Remove All Filters
+            </Button>
+          </div>
+        )}
 
         <TabsContent value="all">
           <AccountTable
@@ -416,7 +448,7 @@ function CreditWalletTransactions() {
         </TabsContent>
         <TabsContent value="processPending">
           <AccountTable
-            columns={processPendingColumns}
+            columns={processPendingColumns as ColumnTable<WalletTransactionListObj>[]}
             data={transactions}
             totalItems={data?.total || 0}
             itemsPerPage={limit}
@@ -429,7 +461,7 @@ function CreditWalletTransactions() {
             isSearchable
             isLoading={isLoading}
             onRowClick={(row) => {
-              setSelectedTransaction(row.wallet_transaction_id as string)
+              setSelectedTransaction(row.wallet_transaction_id)
               setIsTransactionDetailsOpen(true)
             }}
           />

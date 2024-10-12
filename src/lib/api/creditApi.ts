@@ -2,6 +2,7 @@ import {
   createPcAssetType,
   GenericResponse,
   GenericResponseWithMessage,
+  PcAsset,
   PcAssetsResponseData,
 } from '../types/types'
 import axiosInstance, { setInstance } from './axiosInstance'
@@ -10,7 +11,7 @@ interface getPcParams {
   page: number
   limit: number
   search?: string
-  state?: string
+  status?: string
 }
 export const createPcAsset = async (
   body: createPcAssetType
@@ -37,6 +38,14 @@ export const getAllPcAssets = async (
   const assetResponse = await axiosInstance.get('/dashboard/pc/assets', {
     params,
   })
+
+  return assetResponse?.data?.data
+}
+export const getPcAssetById = async (assetId: string): Promise<PcAsset> => {
+  setInstance(axiosInstance)
+  const assetResponse = await axiosInstance.get(
+    `/dashboard/pc/assets/${assetId}`
+  )
 
   return assetResponse?.data?.data
 }

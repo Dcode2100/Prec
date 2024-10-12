@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
+import { useSearchParams } from 'next/navigation'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,19 +34,20 @@ const FilterDateSelect = ({
   onDateSelect,
   disabled,
 }: FilterDateSelectProps) => {
+  const searchParams = useSearchParams()
   const [showCalInput, setShowCalInput] = useState(false)
   const [selected, setSelected] = useState('Anytime')
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
-
-  useEffect(() => {
-    if (dateRange?.from && dateRange?.to) {
-      setSelected(
-        `${moment(dateRange.from).format('MMM D, YYYY')} - ${moment(
-          dateRange.to
-        ).format('MMM D, YYYY')}`
-      )
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    const startDate = searchParams.get('startDate')
+    const endDate = searchParams.get('endDate')
+    if (startDate && endDate) {
+      return {
+        from: new Date(startDate),
+        to: new Date(endDate),
+      }
     }
-  }, [dateRange])
+    return undefined
+  })
 
   const windowSelect = (window: string) => {
     const [value, unit] = window.split('-')
@@ -110,7 +112,7 @@ const FilterDateSelect = ({
               className="w-full"
               date={dateRange}
               onDateChange={(range: DateRange | undefined) => {
-                setDateRange(range)
+                setDateRange(range || undefined)
               }}
             />
           )}

@@ -1,25 +1,22 @@
 import { getGlobalItem } from '@/utils/utils'
 import {
   AnalyticsDataResponse,
+  AssetsForPC,
   AssetsParams,
   GenericResponse,
   GenericResponseWithMessage,
   GetAllNominatorOrders,
   GetAllOrders,
   GetArohResponse,
-  GetAssetsResponse,
   GetOrdersResponse,
-  GetTokenResponse,
   OrderDetailResponse,
   OrderResponse,
   OrdersParams,
+  TokenResponse,
   UpdateHolding,
 } from '../types/types'
 import axiosInstance, { setInstance } from './axiosInstance'
 import { PCOrderResponse, PCOrdersDetailResponse } from '../types/PcEnquiryType'
-
-let appKey = getGlobalItem('chace-app-key')
-let userLoggedIn = getGlobalItem('userLoggedIn')
 
 export const getOrders = async (
   params: OrdersParams
@@ -70,7 +67,9 @@ export const getPCOrders = async (params: OrdersParams) => {
   setInstance(axiosInstance)
   const response = await axiosInstance.get<PCOrderResponse>(
     `/dashboard/pc/orders`,
-    { params }
+    {
+      params,
+    }
   )
 
   return response?.data?.data
@@ -466,21 +465,20 @@ export const getTotalOrdersGraphData = async () => {
   return response.data?.data
 }
 
-export const getAssetsForPC = async (params: AssetsParams): Promise<any> => {
+export const getAssetsForPC = async (
+  params?: AssetsParams
+): Promise<{ assets: AssetsForPC[]; total: number }> => {
   setInstance(axiosInstance)
-  const response = await axiosInstance.get<GenericResponse<GetAssetsResponse>>(
-    `/dashboard/pc/assets/options`,
-    { params }
-  )
-  return response.data
+  const response = await axiosInstance.get(`/dashboard/pc/assets/options`, {
+    params,
+  })
+  return response.data?.data
 }
 
-export const getTokens = async (): Promise<any> => {
+export const getTokens = async (): Promise<TokenResponse[]> => {
   setInstance(axiosInstance)
-  const response = await axiosInstance.get<GenericResponse<GetTokenResponse>>(
-    `/dashboard/assets/options`
-  )
-  return response.data
+  const response = await axiosInstance.get(`/dashboard/assets/options`)
+  return response.data?.data
 }
 
 export const processRefundAmount = async (

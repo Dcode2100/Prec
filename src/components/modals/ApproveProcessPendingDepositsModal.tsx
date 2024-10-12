@@ -46,8 +46,8 @@ interface loading {
 
 interface ApproveProcessPendingDepositsModalProps {
   isLoadingAction: loading
-  setIsLoadingAction: Function
-  refetch: Function
+  setIsLoadingAction: (value: loading) => void
+  refetch: () => void
 }
 
 const ApproveProcessPendingDepositsModal = ({

@@ -147,13 +147,21 @@ const Acquisition = () => {
         <DashboardStatCard
           title="Waitlist"
           value={acquisitions?.totalWaitlistUsersCount || 0}
-          onClick={() => router.push(`/acquisition/ALL`)}
+          onClick={() =>
+            router.push(
+              `/acquisition/ALL?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Pending Waitlist"
           value={acquisitions?.pendingWaitlistUsersCount || 0}
-          onClick={() => router.push(`/acquisition/PENDING`)}
+          onClick={() =>
+            router.push(
+              `/acquisition/PENDING?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>
@@ -162,13 +170,21 @@ const Acquisition = () => {
         <DashboardStatCard
           title="Sent Access code"
           value={acquisitions?.sentAccessCodeCount || 0}
-          onClick={() => router.push(`/acquisition/SENT_CODE`)}
+          onClick={() =>
+            router.push(
+              `/acquisition/SENT_CODE?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
         <DashboardStatCard
           title="Did not send access code"
           value={acquisitions?.didNotSendAccessCodeCount || 0}
-          onClick={() => router.push(`/acquisition/DID_NOT_SEND_CODE`)}
+          onClick={() =>
+            router.push(
+              `/acquisition/DID_NOT_SEND_CODE?startDate=${dateFilter.startDate?.toISOString()}&endDate=${dateFilter.endDate?.toISOString()}`
+            )
+          }
           isLoading={isLoading}
         />
       </div>

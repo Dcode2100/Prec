@@ -14,7 +14,7 @@ interface FilterSelectProps {
   selected: string;
 }
 
-export const FilterSelect: React.FC<FilterSelectProps> = ({
+ const FilterSelect: React.FC<FilterSelectProps> = ({
   header,
   options,
   onSelect,
@@ -37,4 +37,6 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
       </Select>
     </div>
   );
-};
+ };
+
+export default FilterSelect;

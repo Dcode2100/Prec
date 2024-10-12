@@ -17,8 +17,6 @@ type EnumDictionary<T extends string | number, U> = {
   [K in T]: U;
 };
 
-// Used to map 'arbitrary' responses
-// eslint-disable-next-line
 export type Generic = { [key: string]: any };
 
 /*

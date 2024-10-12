@@ -1,9 +1,8 @@
 'use client'
-
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { AccountTable } from '@/components/accountTable/AccountTable'
+import AccountTable from '@/components/accountTable/AccountTable'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -101,7 +100,7 @@ function DebitWalletTransactions() {
   const { slug } = useParams()
   const slugString = Array.isArray(slug) ? slug[0] : slug
   const parts = slugString.split('-')
-  const accountType = parts[0]
+  // const accountType = parts[0]
   const accountId = parts.slice(1).join('-')
 
   const [selectedDebitTab, setSelectedDebitTab] = useState(0)
@@ -336,11 +335,7 @@ function DebitWalletTransactions() {
           isOpen={!!selectedTransaction}
           onClose={() => setSelectedTransaction(undefined)}
           transaction_id={selectedTransaction}
-          type={transactions?.find(
-            (transaction: any) =>
-              transaction.wallet_transaction_id === selectedTransaction
-          )}
-          //   setLoading={debitTransactionsQuery.refetch}
+     
         />
       )}
       <div className="space-y-4 ">
@@ -397,7 +392,7 @@ function DebitWalletTransactions() {
                 if (newLimit) setLimit(newLimit)
               }}
               isLoading={debitTransactionsQuery.isLoading}
-              onRowClick={(row) =>
+              onRowClick={(row: any) =>
                 setSelectedTransaction(row.wallet_transaction_id)
               }
             />
@@ -414,7 +409,7 @@ function DebitWalletTransactions() {
                 if (newLimit) setLimit(newLimit)
               }}
               isLoading={debitTransactionsQuery.isLoading}
-              onRowClick={(row) =>
+              onRowClick={(row: any) =>
                 setSelectedTransaction(row.wallet_transaction_id)
               }
             />
@@ -431,7 +426,7 @@ function DebitWalletTransactions() {
                 if (newLimit) setLimit(newLimit)
               }}
               isLoading={debitTransactionsQuery.isLoading}
-              onRowClick={(row) =>
+              onRowClick={(row: any) =>
                 setSelectedTransaction(row.wallet_transaction_id)
               }
             />
@@ -448,7 +443,7 @@ function DebitWalletTransactions() {
                 if (newLimit) setLimit(newLimit)
               }}
               isLoading={debitTransactionsQuery.isLoading}
-              onRowClick={(row) =>
+              onRowClick={(row: any) =>
                 setSelectedTransaction(row.wallet_transaction_id)
               }
             />

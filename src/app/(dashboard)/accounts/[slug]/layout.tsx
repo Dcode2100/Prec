@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
@@ -23,7 +23,7 @@ const NavItem = ({ item, level = 0 }: { item: TabType; level?: number }) => {
 
   const handleMouseEnter = () => setIsHovered(true)
   const handleMouseLeave = () => setIsHovered(false)
-  const handleClick = () => setIsHovered(false) // Added to close the hover on click
+  const handleClick = () => setIsHovered(false)
 
   return (
     <li
@@ -67,6 +67,37 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname()
   const [openUpdateAccountModal, setOpenUpdateAccountModal] = useState(false)
   const [isChange, setIsChange] = useState(false)
+  const [breadcrumbs, setBreadcrumbs] = useState<Array<{ href: string; label: string }>>([])
+
+  useEffect(() => {
+    const getBreadcrumbs = () => {
+      const paths = pathname.split('/').filter(Boolean)
+      const basePath = `/accounts/${slug}`
+      const crumbs = [{ href: '/accounts', label: 'Accounts' }]
+
+      if (paths.length > 2) {
+        const mainSection = paths[2]
+        crumbs.push({
+          href: `${basePath}/${mainSection}`,
+          label: mainSection.charAt(0).toUpperCase() + mainSection.slice(1)
+        })
+
+        for (let i = 3; i < paths.length; i++) {
+          const subSection = paths[i]
+          crumbs.push({
+            href: `${basePath}/${paths.slice(2, i + 1).join('/')}`,
+            label: subSection.charAt(0).toUpperCase() + subSection.slice(1)
+          })
+        }
+      } else {
+        crumbs.push({ href: basePath, label: 'Overview' })
+      }
+
+      return crumbs
+    }
+
+    setBreadcrumbs(getBreadcrumbs())
+  }, [pathname, slug])
 
   const {
     data: account,
@@ -88,29 +119,6 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
     },
     enabled: !!slug,
   })
-
-  const getBreadcrumbs = () => {
-    const paths = pathname.split('/').filter(Boolean)
-    const isRootAccountPage = paths.length === 2 // ['accounts', '[slug]']
-
-    if (isRootAccountPage) {
-      return [
-        { href: '/accounts', label: 'Accounts' },
-        { href: pathname, label: 'Overview' },
-      ]
-    } else {
-      const currentPageName = paths[paths.length - 1]
-      return [
-        { href: '/accounts', label: 'Accounts' },
-        { href: `/accounts/${slug}`, label: 'Overview' },
-        {
-          href: pathname,
-          label:
-            currentPageName.charAt(0).toUpperCase() + currentPageName.slice(1),
-        },
-      ]
-    }
-  }
 
   if (isLoading) {
     return <Loader />
@@ -148,9 +156,9 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
         />
       </div>
 
-      <BreadCrumbs items={getBreadcrumbs()} />
+      <BreadCrumbs items={breadcrumbs} />
 
-      <div className="Account-slug-content-layout h-[calc(100vh-100px)] overflow-y-auto bg-background rounded-lg p-4 mb-2">
+      <div className="Account-slug-content-layout h-[calc(100vh-100px)] overflow-y-auto bg-background rounded-lg p-3 mb-2">
         {children}
       </div>
     </div>

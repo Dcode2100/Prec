@@ -57,7 +57,7 @@ interface DataTableProps<T> {
   onRowClick?: (row: T) => void
 }
 
-export function AccountTable<T extends object>({
+function AccountTable<T extends object>({
   isSearchable,
   columns,
   data,
@@ -82,7 +82,10 @@ export function AccountTable<T extends object>({
   } | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
   const { toast } = useToast()
-  const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null)
+  const [hoveredCell, setHoveredCell] = useState<{
+    row: number
+    col: number
+  } | null>(null)
 
   // Store the original data order
   const [originalData, setOriginalData] = useState<T[]>([])
@@ -102,7 +105,7 @@ export function AccountTable<T extends object>({
   const onrowClick = (row: T) => {
     if (onRowClick) {
       onRowClick(row)
-    } 
+    }
   }
 
   const handleSort = (key: keyof T) => {
@@ -141,7 +144,12 @@ export function AccountTable<T extends object>({
   const getItemColor = (value: T[keyof T], header: string): string => {
     if (typeof value !== 'string') return ''
     const lowerValue = value.toLowerCase()
-    if (['completed', 'success',"complete"].includes(lowerValue)) return 'text-green-500'
+    if (
+      ['completed', 'success', 'complete', 'refund_completed'].includes(
+        lowerValue
+      )
+    )
+      return 'text-green-500'
     if (
       [
         'pending',
@@ -163,7 +171,11 @@ export function AccountTable<T extends object>({
   const renderStatus = (status: string) => {
     const lowerStatus = status.toLowerCase()
     let icon
-    if (['completed', 'success', 'complete'].includes(lowerStatus)) {
+    if (
+      ['completed', 'success', 'complete', 'refund_completed'].includes(
+        lowerStatus
+      )
+    ) {
       icon = <CheckIcon className="h-4 w-4 mr-1" />
     } else if (['rejected', 'failed', 'cancelled'].includes(lowerStatus)) {
       icon = <XIcon className="h-4 w-4 mr-1" />
@@ -209,8 +221,8 @@ export function AccountTable<T extends object>({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <>
+      <div className="flex items-center justify-between mb-2">
         {isSearchable && (
           <div className="flex items-center max-w-sm relative">
             <SearchIcon className="h-5 w-5 absolute left-3" />
@@ -252,12 +264,19 @@ export function AccountTable<T extends object>({
               {columns.map((column) => (
                 <TableHead
                   key={column.header}
-                  onClick={() => column.sortable && handleSort(column.accessorKey)}
+                  onClick={() =>
+                    column.sortable && handleSort(column.accessorKey)
+                  }
                   className={cn(
                     'cursor-pointer whitespace-nowrap',
                     column.sortable && 'hover:bg-muted'
                   )}
-                  style={{ width: columnWidths[column.accessorKey as keyof typeof columnWidths] }}
+                  style={{
+                    width:
+                      columnWidths[
+                        column.accessorKey as keyof typeof columnWidths
+                      ],
+                  }}
                 >
                   <div className="flex items-center justify-between">
                     <span>{column.header}</span>
@@ -280,22 +299,37 @@ export function AccountTable<T extends object>({
                 </TableHead>
               ))}
               {(onDelete || onDownload || onClickSendEmail) && (
-                <TableHead className="whitespace-nowrap" style={{ width: '150px' }}>Actions</TableHead>
+                <TableHead
+                  className="whitespace-nowrap"
+                  style={{ width: '150px' }}
+                >
+                  Actions
+                </TableHead>
               )}
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={columns.length + (onDelete || onDownload || onClickSendEmail ? 1 : 0)}>
+                <TableCell
+                  colSpan={
+                    columns.length +
+                    (onDelete || onDownload || onClickSendEmail ? 1 : 0)
+                  }
+                >
                   <div className="h-[400px] w-full flex items-center justify-center">
                     <Loader />
                   </div>
                 </TableCell>
               </TableRow>
             ) : sortedData.length === 0 ? (
-              <TableRow >
-                <TableCell colSpan={columns.length + (onDelete || onDownload || onClickSendEmail ? 1 : 0)}>
+              <TableRow>
+                <TableCell
+                  colSpan={
+                    columns.length +
+                    (onDelete || onDownload || onClickSendEmail ? 1 : 0)
+                  }
+                >
                   <div className="min-h-[calc(100vh-350px)] relative w-full flex items-center justify-center">
                     No data available
                   </div>
@@ -315,8 +349,15 @@ export function AccountTable<T extends object>({
                         getItemColor(row[column.accessorKey], column.header),
                         'relative pr-8' // Added right padding for copy icon
                       )}
-                      style={{ width: columnWidths[column.accessorKey as keyof typeof columnWidths] }}
-                      onMouseEnter={() => setHoveredCell({ row: rowIndex, col: colIndex })}
+                      style={{
+                        width:
+                          columnWidths[
+                            column.accessorKey as keyof typeof columnWidths
+                          ],
+                      }}
+                      onMouseEnter={() =>
+                        setHoveredCell({ row: rowIndex, col: colIndex })
+                      }
                       onMouseLeave={() => setHoveredCell(null)}
                     >
                       <TooltipProvider>
@@ -345,24 +386,25 @@ export function AccountTable<T extends object>({
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                      {hoveredCell?.row === rowIndex && hoveredCell?.col === colIndex && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <CopyIcon
-                                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyToClipboard(row[column.accessorKey] as string);
-                                }}
-                              />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              Copy to clipboard
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
+                      {hoveredCell?.row === rowIndex &&
+                        hoveredCell?.col === colIndex && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <CopyIcon
+                                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    copyToClipboard(
+                                      row[column.accessorKey] as string
+                                    )
+                                  }}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent>Copy to clipboard</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
                     </TableCell>
                   ))}
                   {(onDelete || onDownload || onClickSendEmail) && (
@@ -483,6 +525,8 @@ export function AccountTable<T extends object>({
           </Button>
         </div>
       </div>
-    </div>
+    </>
   )
 }
+
+export default AccountTable

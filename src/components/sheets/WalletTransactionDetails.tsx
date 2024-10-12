@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { CheckIcon, XIcon, ClockIcon, CopyIcon } from 'lucide-react'
 import moment from 'moment'
-// import { useRouter } from "next/router";
 
 import { Button } from '@/components/ui/button'
 import {
@@ -10,7 +9,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
 } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
@@ -35,7 +33,6 @@ const WalletTransactionDetails = ({
   transaction_id,
 }: WalletTransactionDetailsProps): React.ReactElement => {
   const { toast } = useToast()
-  //   const router = useRouter();
 
   const { data: transactionData, isLoading: isTransactionLoading } = useQuery({
     queryKey: ['transaction_details', transaction_id],
@@ -93,7 +90,7 @@ const WalletTransactionDetails = ({
     </div>
   )
 
-  const handleAccountDetail = (account: any) => {
+  const handleAccountDetail = () => {
     // router.push(`/accounts/PE/${account?.account_id}`);
   }
 

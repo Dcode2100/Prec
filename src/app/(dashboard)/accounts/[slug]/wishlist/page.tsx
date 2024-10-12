@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { AccountTable } from '@/components/accountTable/AccountTable'
+import AccountTable from '@/components/accountTable/AccountTable'
 import { ColumnDef } from '@tanstack/react-table'
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
@@ -25,6 +25,8 @@ import { DateRangePicker } from '@/components/DateRangePicker'
 import { getAccountWishlist, getAccountPcWishlist } from '@/lib/api/wishlistApi'
 import { getTokens, getAssetsForPC } from '@/lib/api/ordersApi'
 import { DateRange } from 'react-day-picker'
+import { WishlistResponse } from '@/lib/types/types'
+import { ColumnTable } from '@/lib/types'
 
 const WishlistTable = (): React.ReactElement => {
   const { slug } = useParams()
@@ -102,7 +104,7 @@ const WishlistTable = (): React.ReactElement => {
       getAccountPcWishlist(accountId, { page, limit, ...pcFilterParams }),
   })
 
-  const PEColumns: ColumnDef<any>[] = [
+  const PEColumns: ColumnTable<WishlistResponse>[] = [
     {
       accessorKey: 'token',
       header: 'Token',
@@ -115,19 +117,19 @@ const WishlistTable = (): React.ReactElement => {
     { accessorKey: 'email', header: 'Email' },
     { accessorKey: 'mobile', header: 'Mobile' },
     {
-      accessorKey: 'notify',
+      accessorKey: 'notified',
       header: 'Notified',
       cell: (value) => (value ? 'Yes' : 'No'),
     },
   ]
 
-  const PCColumns: ColumnDef<any>[] = [
+  const PCColumns: ColumnTable<WishlistResponse>[] = [
     {
       accessorKey: 'name',
       header: 'Token',
     },
     {
-      accessorKey: 'first_name',
+      accessorKey: 'name',
       header: 'Name',
     },
     {
@@ -143,7 +145,7 @@ const WishlistTable = (): React.ReactElement => {
       header: 'Mobile',
     },
     {
-      accessorKey: 'notify',
+      accessorKey: 'notified',
       header: 'Notified',
       cell: (value) => (value ? 'Yes' : 'No'),
     },
