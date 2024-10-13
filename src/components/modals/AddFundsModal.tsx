@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
-import { CalendarIcon } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -33,7 +31,6 @@ import { useToast } from '@/hooks/use-toast'
 
 import { addFunds } from '@/lib/api/fundApi'
 import { AddFundsParams } from '@/lib/types/types'
-
 interface AddFundsModal {
   openAddFundsModal: boolean
   setOpenAddFundsModal: (value: boolean) => void
@@ -183,18 +180,18 @@ const AddFundsModal = ({
 
   return (
     <Dialog open={openAddFundsModal} onOpenChange={setOpenAddFundsModal}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
-          <DialogTitle>Confirmation</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">Confirmation</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={onSubmit}>
+          <form onSubmit={onSubmit} className="space-y-4">
             <FormField
               control={form.control}
               name="transactionType"
               render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Select Transaction Type</FormLabel>
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Select Transaction Type</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={(value) => {
@@ -205,23 +202,20 @@ const AddFundsModal = ({
                       defaultValue="UPI"
                       className="flex flex-row space-x-4"
                     >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormItem className="flex items-center space-x-2">
                         <FormControl>
                           <RadioGroupItem value="UPI" />
                         </FormControl>
                         <FormLabel className="font-normal">UPI</FormLabel>
                       </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormItem className="flex items-center space-x-2">
                         <FormControl>
                           <RadioGroupItem value="BANK_TRANSFER" />
                         </FormControl>
-                        <FormLabel className="font-normal">
-                          Bank Transfer
-                        </FormLabel>
+                        <FormLabel className="font-normal">Bank Transfer</FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -241,83 +235,51 @@ const AddFundsModal = ({
                 )}
               />
             ) : (
-              <div className="grid grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="utr"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>UTR Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter UTR Number"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(e.target.value.toUpperCase())
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="depositAmount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Deposit Amount</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter Deposit Amount" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="createdAt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Created At</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="datetime-local"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(new Date(e.target.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                {[
+                  { name: "utr", label: "UTR Number", placeholder: "Enter UTR Number" },
+                  { name: "remitterName", label: "Remitter Name", placeholder: "Enter Remitter Name" },
+                  { name: "depositAmount", label: "Deposit Amount", placeholder: "Enter Deposit Amount" },
+                  { name: "remitterAccountNumber", label: "Remitter Account Number", placeholder: "Enter Remitter Account Number" },
+                  { name: "createdAt", label: "Created At", type: "datetime-local" },
+                  { name: "remitterIfsc", label: "Remitter Ifsc", placeholder: "Enter Remitter Ifsc" },
+                ].map((field) => (
+                  <FormField
+                    key={field.name}
+                    control={form.control}
+                    name={field.name as any}
+                    render={({ field: formField }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">{field.label}</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="h-9"
+                            type={field.type || "text"}
+                            placeholder={field.placeholder}
+                            {...formField}
+                           
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
                 <FormField
                   control={form.control}
                   name="paymentMode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Payment Mode</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <FormLabel className="text-sm font-medium">Payment Mode</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-9">
                             <SelectValue placeholder="Select Payment Mode" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {[
-                            { paymentMode: 'IMPS' },
-                            { paymentMode: 'NEFT' },
-                            { paymentMode: 'RTGS' },
-                            { paymentMode: 'UPI' },
-                          ].map((el, idx) => (
-                            <SelectItem key={idx} value={el.paymentMode}>
-                              {el.paymentMode}
-                            </SelectItem>
+                          {["IMPS", "NEFT", "RTGS", "UPI"].map((mode) => (
+                            <SelectItem key={mode} value={mode}>{mode}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -327,99 +289,12 @@ const AddFundsModal = ({
                 />
                 <FormField
                   control={form.control}
-                  name="remitterName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Remitter Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter Remitter Name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {currentPaymentMode === 'UPI' ? (
-                  <FormField
-                    control={form.control}
-                    name="vendor_transaction_id"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Vendor Transaction ID</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter Vendor Transaction ID"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(e.target.value.toUpperCase())
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                ) : (
-                  <FormField
-                    control={form.control}
-                    name="remitterAccountNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Remitter Account Number</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Enter Remitter Account Number"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-                {currentPaymentMode === 'UPI' ? (
-                  <FormField
-                    control={form.control}
-                    name="upi_id"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>UPI ID</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter UPI ID" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                ) : (
-                  <FormField
-                    control={form.control}
-                    name="remitterIfsc"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Remitter Ifsc</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter Remitter Ifsc"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(e.target.value.toUpperCase())
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-                <FormField
-                  control={form.control}
                   name="paymentRemark"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Payment Remark</FormLabel>
+                      <FormLabel className="text-sm font-medium">Payment Remark</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter Remark" {...field} />
+                        <Input className="h-9" placeholder="Enter Remark" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -428,11 +303,11 @@ const AddFundsModal = ({
               </div>
             )}
 
-            <DialogFooter>
-              <Button variant="outline" onClick={handleModalClose}>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="secondary" onClick={handleModalClose} className="flex-1 sm:flex-none">
                 Close
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading} className="flex-1 sm:flex-none">
                 {isLoading ? 'Loading...' : 'Confirm'}
               </Button>
             </DialogFooter>
