@@ -703,6 +703,7 @@ export interface NominatorResponse {
   code: string
   status: boolean
   accounts: string
+  id: string
   created_at?: string
   updated_at?: string
 }
@@ -734,6 +735,7 @@ export interface AccountResponse {
   pc_holdings?: AccountWisePcHoldingData[]
   total_pe_holdings_value: string
   total_pc_holdings_value: string
+  
 }
 
 export interface CoinTransactionResponse {

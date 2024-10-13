@@ -164,8 +164,6 @@ const AccountingTable = () => {
         <DataTable
           columns={columnsForAccountingTransactions() as ColumnDef<DaywiseTransaction>[]}
           data={transactions?.daywise_transaction_data || []}
-          enableSearch={false}
-          enableDropdown={false}
           page={pagination.common.page}
           limit={pagination.common.limit}
           onPageChange={(page) => {
@@ -180,11 +178,8 @@ const AccountingTable = () => {
               common: { ...prev.common, limit },
             }))
           }}
-          filter={''}
-          onChangeFilter={() => {}}
           total={transactions?.count || 0}
           isLoading={isLoading}
-          refetch={() => {}}
           onRowClick={() => {}}
         />
       </div>

@@ -1,8 +1,6 @@
 'use client'
-
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
-import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -11,26 +9,34 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { DateRangePicker } from '@/components/DateRangePicker'
-import { Label } from '@/components/ui/label'
 import { DateRange } from 'react-day-picker'
 
 interface FilterDateSelectProps {
-  header: string
   onDateSelect: (
     startDate: moment.Moment | null,
     endDate: moment.Moment | null
   ) => void
   disabled?: boolean
+  selectedDateRange?: [Date | null, Date | null]
 }
 
 const FilterDateSelect = ({
-  header,
+  selectedDateRange,
   onDateSelect,
   disabled,
 }: FilterDateSelectProps) => {
   const [showCalInput, setShowCalInput] = useState(false)
   const [selected, setSelected] = useState('Anytime')
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(
+    selectedDateRange
+      ? {
+          from: selectedDateRange[0]
+            ? new Date(selectedDateRange[0])
+            : undefined,
+          to: selectedDateRange[1] ? new Date(selectedDateRange[1]) : undefined,
+        }
+      : undefined
+  )
 
   useEffect(() => {
     if (dateRange?.from && dateRange?.to) {
@@ -51,15 +57,11 @@ const FilterDateSelect = ({
     const end = moment()
     setDateRange({ from: start.toDate(), to: end.toDate() })
     setSelected(`Last ${value} ${unit}`)
-    onDateSelect(start, end) // Add this line to trigger the callback
+    onDateSelect(start, end)
   }
-
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <Label>{header}</Label>
-      </div>
       <Select
         disabled={disabled}
         onValueChange={(value) => {

@@ -13,6 +13,7 @@ import FilterDrawer from './components/filterDrawer'
 import { getAllPennyDropTransactions } from '@/lib/api/transactionsApi'
 import { TransactionsParams } from '@/lib/types/types'
 import { TransactionListObj } from '@/lib/types/types'
+
 const PennyDropTransactionPage = () => {
   const [search, setSearch] = useState('')
   const [pagination, setPagination] = useState({
@@ -149,8 +150,6 @@ const PennyDropTransactionPage = () => {
             columnsForPennyDropTransactions() as ColumnDef<TransactionListObj>[]
           }
           data={transactions?.transactions || []}
-          enableSearch={false}
-          enableDropdown={false}
           page={pagination.common.page}
           limit={pagination.common.limit}
           onPageChange={(page) => {
@@ -165,11 +164,8 @@ const PennyDropTransactionPage = () => {
               common: { ...prev.common, limit },
             }))
           }}
-          filter={''}
-          onChangeFilter={() => {}}
           total={transactions?.total || 0}
           isLoading={isLoading}
-          refetch={() => {}}
           onRowClick={() => {}}
         />
       </div>

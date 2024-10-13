@@ -2,35 +2,37 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import AccountTable from '@/components/accountTable/AccountTable'
+import { useQuery } from '@tanstack/react-query'
+import moment from 'moment'
+import { CSVLink } from 'react-csv'
+import { FilterIcon, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Input } from '@/components/ui/input'
+import { DataTable } from '@/components/CustomTable/data-table'
 import { getAccounts } from '@/lib/api/accountApi'
 import {
   AccountResponse,
   AccountsParams,
   AccountStatus,
 } from '@/lib/types/types'
-import { CSVLink } from 'react-csv'
-import moment from 'moment'
 import { useDebounce } from '@/hooks/useDebounce'
 import { usePagination } from '@/hooks/usePagination'
-import { useQuery } from '@tanstack/react-query'
-import FilterDateSelect from '@/components/accountTable/FilterDateSelect'
-import { DatePicker } from '@/components/DatePicker'
-import { FilterIcon, X } from 'lucide-react' // Add this import
-import FilterDrawer from '@/components/accountTable/FilterDrawer'
-import { ColumnTable } from '@/lib/types'
-import { Input } from '@/components/ui/input' // Add this import
+import { columnsForAccounts } from './components/columns'
+import {
+  getHeadersForCSV,
+  accountsToTableRowsCSV,
+} from './components/exportcsv'
+import FilterDrawer from './components/FilterDrawer'
+import { ColumnDef } from '@tanstack/react-table'
 
 const AccountsPage = () => {
   const [selectedTab, setSelectedTab] = useState('all')
   const router = useRouter()
 
   const [statusFilter, setStatusFilter] = useState('All')
-  const [exportData, setExportData] = useState<[string, string][]>([])
   const [search, setSearch] = useState('')
-  const debouncedSearch = useDebounce(search, 500)
+  const debouncedSearch = useDebounce(search, 600)
 
   const { currentPage, itemsPerPage, onPageChange } = usePagination({
     initialPage: 1,
@@ -99,34 +101,12 @@ const AccountsPage = () => {
       ['All', 'ACTIVE', 'COMPLETE', 'PENDING'].includes(statusFilter) &&
       !debouncedSearch
     ),
-    select: (data) => ({
-      ...data,
-      accounts: data?.accounts?.map((account: AccountResponse) => ({
-        ...account,
-        created_at: moment(account.created_at).format('YYYY-MM-DD HH:mm:ss'),
-        evaluation_expiry_date: moment(account.evaluation_expiry_date).format(
-          'YYYY-MM-DD HH:mm:ss'
-        ),
-      })),
-    }),
   })
 
   const accounts = useMemo(
     () => data?.accounts || ([] as AccountResponse[]),
     [data]
   )
-
-  useEffect(() => {
-    setExportData(
-      accounts.map((row: any) => ({
-        ...row,
-        created_at: moment(row?.created_at).format('YYYY-MM-DD HH:mm:ss'),
-        evaluation_expiry_date: moment(row?.evaluation_expiry_date).format(
-          'YYYY-MM-DD HH:mm:ss'
-        ),
-      }))
-    )
-  }, [accounts])
 
   const handleTabChange = (value: string) => {
     setSelectedTab(value)
@@ -136,32 +116,20 @@ const AccountsPage = () => {
     else if (value === 'pending') status = AccountStatus.PENDING
     else if (value === 'pc-active') status = AccountStatus.PC_ACTIVE
     else if (value === 'pc-inactive') status = AccountStatus.PC_INACTIVE
-    onPageChange(1) // Reset to first page when changing tabs
+    onPageChange(1)
     setStatusFilter(status)
   }
 
-  const columns: ColumnTable<AccountResponse>[] = [
-    { header: 'Account ID', accessorKey: 'gui_account_id' },
-    { header: 'Name', accessorKey: 'first_name', sortable: true },
-    { header: 'Mobile', accessorKey: 'mobile' },
-    { header: 'Email', accessorKey: 'email' },
-    { header: 'Balance', accessorKey: 'wallet_balance', sortable: true },
-    { header: 'Withdraw', accessorKey: 'withdraw_balance', sortable: true },
-    { header: 'Tracker', accessorKey: 'onboarding_tracker', sortable: true },
-    { header: 'Status', accessorKey: 'status', sortable: true },
-    { header: 'Created At', accessorKey: 'created_at', sortable: true },
-  ]
-
   const handleSearch = (value: string) => {
     setSearch(value)
-    onPageChange(1) // Reset to first page when searching
+    onPageChange(1)
   }
 
   const handleApplyFilters = () => {
     setCreatedAtRange(tempCreatedAtRange)
     setExpiryDate(tempExpiryDate)
     setDobDate(tempDobDate)
-    setIsFilterOpen(false) // Close the sheet
+    setIsFilterOpen(false)
     refetch()
   }
 
@@ -183,9 +151,9 @@ const AccountsPage = () => {
 
   return (
     <div className="container min-w-full relative w-full bg-background rounded-lg p-4">
-      <h3 className="mb-4 ">Accounts</h3>
+      <h3 className="mb-4">Accounts</h3>
       <Tabs value={selectedTab} onValueChange={handleTabChange}>
-        <div className="flex justify-between items-center ">
+        <div className="flex justify-between items-center">
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="active">Active</TabsTrigger>
@@ -206,10 +174,11 @@ const AccountsPage = () => {
           <div className="flex items-center space-x-2">
             {accounts.length > 0 && (
               <CSVLink
-                data={exportData}
+                data={accountsToTableRowsCSV(accounts as AccountResponse[])}
                 filename={`AccountsData_${moment().format(
                   'MMMM Do YYYY, h:mm:ss a'
                 )}.csv`}
+                headers={getHeadersForCSV()}
               >
                 <Button className="h-9 px-4">Export</Button>
               </CSVLink>
@@ -231,13 +200,14 @@ const AccountsPage = () => {
           </div>
         </div>
         <TabsContent value={selectedTab}>
-          <AccountTable
-            columns={columns}
-            data={accounts}
-            totalItems={data?.total || 0}
-            itemsPerPage={itemsPerPage}
-            currentPage={currentPage}
+          <DataTable
+            columns={columnsForAccounts() as ColumnDef<AccountResponse>[]}
+            data={accounts as AccountResponse[]}
+            total={data?.total || 0}
+            limit={itemsPerPage}
+            page={currentPage}
             onPageChange={onPageChange}
+            onRowChange={() => onPageChange(1)}
             isLoading={isLoading || isFetching}
             onRowClick={(row) => {
               const accountType =
@@ -252,36 +222,13 @@ const AccountsPage = () => {
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         onApply={handleApplyFilters}
-      >
-        <div className="space-y-4">
-          <FilterDateSelect
-            header="Created Date Range"
-            onDateSelect={(start, end) => {
-              setTempCreatedAtRange([
-                start?.toDate() || null,
-                end?.toDate() || null,
-              ])
-            }}
-          />
-          <div className="space-y-2">
-            <h4>Expiry Date</h4>
-            <DatePicker
-              date={tempExpiryDate}
-              setDate={(date) => setTempExpiryDate(date)}
-              placeholder="Select expiry date"
-              showTime={true}
-            />
-          </div>
-          <div className="space-y-2">
-            <h4>Date of Birth</h4>
-            <DatePicker
-              date={tempDobDate}
-              setDate={(date) => setTempDobDate(date)}
-              placeholder="Select date of birth"
-            />
-          </div>
-        </div>
-      </FilterDrawer>
+        tempCreatedAtRange={tempCreatedAtRange}
+        setTempCreatedAtRange={setTempCreatedAtRange}
+        tempExpiryDate={tempExpiryDate}
+        setTempExpiryDate={setTempExpiryDate}
+        tempDobDate={tempDobDate}
+        setTempDobDate={setTempDobDate}
+      />
     </div>
   )
 }

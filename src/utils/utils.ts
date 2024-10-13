@@ -102,3 +102,19 @@ export const pennyDropTransactionsToTableRows = (
     moment(transaction?.updated_at || ''),
   ])
 }
+
+export const unquotedKeysString = (data: any) => {
+  return `[${data
+    .map(
+      (obj: any) =>
+        '{' +
+        Object.entries(obj)
+          .map(
+            ([key, value]) =>
+              `${key}: ${value === null ? 'null' : `'${value}'`}`
+          )
+          .join(', ') +
+        '}'
+    )
+    .join(', ')}]`
+}
