@@ -16,102 +16,77 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { manualCoinTransfer } from '@/lib/api/coinApi'
 import AddFundsModal from '@/components/modals/AddFundsModal'
+import { AccountResponseById } from '@/lib/types/accountType'
 import CreateAWithdrawTransaction from '@/components/modals/CreateAWithdrawTransaction'
 import CreateCoinWithdrawTransaction from '@/components/modals/CreateCoinWithdrawTransaction'
+import { CopyButton } from '@/components/CopyButton'
 
-// New types
-type Contact = {
-  name?: string
-  email?: string
-  mobile?: string
-  whatsapp_notification?: boolean
-  created_at?: string
-  updated_at?: string
-}
-
-type Identity = {
-  pan?: string
-  pan_linked?: boolean
-  pan_updated_at?: string
-}
-
-type BankDetails = {
-  account_number?: string
-  bank_name?: string
-  branch?: string
-  ifsc?: string
-  verification_status?: string
-}
-
-type VABankDetails = {
-  account_number?: string
-  ifsc?: string
-}
-
-type WalletDetails = {
-  vendor_name?: string
-  provider_name?: string
-  migrated?: boolean
-  acknowledged?: boolean
-  acknowledged_at?: string
-}
-
-type AccountDetails = {
-  account_id: string
-  wallet_id?: string
-  contact: Contact
-  bank_details?: BankDetails
-  va_bank_details?: VABankDetails
-  wallet_details?: WalletDetails
-  aroh_user_funds?: {
-    total_investment?: string
-    current_value?: string
-    accrued_returns?: string
-  }
-  user_funds?: {
-    pnl?: string
-    pnl_percentage?: string
-    current_value?: string
-    total_investment?: string
-    balance?: string
-  }
-  wallet_withdraw_amount?: string
-  coins?: number
-  status?: string
-  decentro_wallet_id?: string
-  wallet_balance?: string
-}
-
-const ContactAccordion = ({ contact }: { contact: Contact }) => (
+const ContactAccordion = ({
+  accountResponse,
+}: {
+  accountResponse: AccountResponseById
+}) => (
   <Accordion type="single" collapsible className="w-full">
     <AccordionItem value="contact-details">
       <AccordionTrigger>Contact Details</AccordionTrigger>
       <AccordionContent>
         <div className="space-y-3">
-          <ContactItem label="Full Name" value={contact?.name ?? '-'} />
-          <ContactItem label="Email Address" value={contact?.email ?? '-'} />
-          <ContactItem label="Mobile" value={contact?.mobile ?? '-'} />
-          <ContactItem label="Demat Account No" value="-" />
+          <ContactItem
+            label="Full Name"
+            value={accountResponse?.contact?.name ?? '-'}
+          />
+          <ContactItem
+            label="Email Address"
+            value={accountResponse?.contact?.email ?? '-'}
+          />
+          <ContactItem
+            label="Mobile"
+            value={
+              accountResponse?.contact?.mobile
+                ? accountResponse?.contact?.mobile.toString()
+                : '-'
+            }
+          />
+          <ContactItem
+            label="Demat Account No"
+            value={accountResponse?.identity?.bo_id?.[0] ?? '-'}
+          />
           <ContactItem
             label="WhatsApp Notification"
-            value={contact?.whatsapp_notification ? 'True' : 'False'}
+            value={accountResponse?.whatsapp_notification ? 'True' : 'False'}
           />
-          <ContactItem label="Nominated By" value="Access Code" />
-          <ContactItem label="Referred By" value="-" />
+          <ContactItem
+            label="Nominated By"
+            value={accountResponse?.nominator?.name ?? '-'}
+          />
+          <ContactItem
+            label="Referred By"
+            value={
+              accountResponse?.referral?.referred_by
+                ? accountResponse?.referral?.referred_by
+                : '-'
+            }
+          />
+          <ContactItem
+            label="Vendor Wallet ID"
+            value={accountResponse?.hypto_vendor_wallet_id ?? '-'}
+          />
+          <div className="flex justify-between h-[1px] bg-border"></div>
+
           <ContactItem label="UPI ID" value="-" />
           <ContactItem
             label="Created At"
             value={
-              contact?.created_at
-                ? new Date(contact.created_at).toLocaleString()
+              accountResponse?.created_at
+                ? new Date(accountResponse?.created_at).toLocaleString()
                 : '-'
             }
           />
           <ContactItem
             label="Updated At"
             value={
-              contact?.updated_at
-                ? new Date(contact.updated_at).toLocaleString()
+              accountResponse?.updated_at
+                ? new Date(accountResponse?.updated_at).toLocaleString()
                 : '-'
             }
           />
@@ -122,26 +97,34 @@ const ContactAccordion = ({ contact }: { contact: Contact }) => (
 )
 
 const ContactItem = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex justify-between">
+  <div className="flex max-h-min justify-between">
     <span className="text-muted-foreground">{label}</span>
-    <span className="text-foreground font-medium">{value}</span>
+    <span className="text-foreground font-medium">
+      <CopyButton className="h-min p-0" value={value}>
+        {value}
+      </CopyButton>
+    </span>
   </div>
 )
 
-const IdentityAccordion = ({ identity }: { identity: Identity }) => (
+const IdentityAccordion = ({
+  accountResponse,
+}: {
+  accountResponse: AccountResponseById
+}) => (
   <Accordion type="single" collapsible className="w-full">
     <AccordionItem value="identity-details">
       <AccordionTrigger>Identity Details</AccordionTrigger>
       <AccordionContent>
         <div className="space-y-3">
-          <IdentityItem label="PAN" value={identity?.pan ?? '-'} />
+          <IdentityItem label="PAN" value={accountResponse?.pan ?? '-'} />
           <IdentityItem
             label="PAN Linked"
-            value={identity?.pan_linked ? 'TRUE' : 'FALSE'}
+            value={accountResponse?.portal_linked ? 'TRUE' : 'FALSE'}
           />
           <IdentityItem
             label="PAN Updated At"
-            value={identity?.pan_updated_at ?? '-'}
+            value={accountResponse?.pan_updated_at ?? '-'}
           />
         </div>
       </AccordionContent>
@@ -152,11 +135,19 @@ const IdentityAccordion = ({ identity }: { identity: Identity }) => (
 const IdentityItem = ({ label, value }: { label: string; value: string }) => (
   <div className="flex justify-between">
     <span className="text-muted-foreground">{label}</span>
-    <span className="text-foreground font-medium">{value}</span>
+    <span className="text-foreground font-medium">
+      <CopyButton className="h-min p-0" value={value}>
+        {value}
+      </CopyButton>
+    </span>
   </div>
 )
 
-const BankDetailsAccordion = ({ bankDetails }: { bankDetails: BankDetails }) => (
+const BankDetailsAccordion = ({
+  accountResponse,
+}: {
+  accountResponse: AccountResponseById
+}) => (
   <Accordion type="single" collapsible className="w-full">
     <AccordionItem value="bank-details">
       <AccordionTrigger>Bank Details</AccordionTrigger>
@@ -164,14 +155,23 @@ const BankDetailsAccordion = ({ bankDetails }: { bankDetails: BankDetails }) => 
         <div className="space-y-3">
           <BankItem
             label="Account Number"
-            value={bankDetails?.account_number ?? '-'}
+            value={accountResponse?.bank_details?.[0]?.account_number ?? '-'}
           />
-          <BankItem label="Bank Name" value={bankDetails?.bank_name ?? '-'} />
-          <BankItem label="Branch" value={bankDetails?.branch ?? '-'} />
-          <BankItem label="Bank IFSC" value={bankDetails?.ifsc ?? '-'} />
+          <BankItem
+            label="Bank Name"
+            value={accountResponse?.bank_details?.[0]?.bank_name ?? '-'}
+          />
+          <BankItem
+            label="Branch"
+            value={accountResponse?.bank_details?.[0]?.branch ?? '-'}
+          />
+          <BankItem
+            label="Bank IFSC"
+            value={accountResponse?.bank_details?.[0]?.ifsc ?? '-'}
+          />
           <BankItem
             label="Bank Verification Status"
-            value={bankDetails?.verification_status ?? 'Not Updated'}
+            value={accountResponse?.bank_details?.[0]?.status ?? 'Not Updated'}
           />
         </div>
       </AccordionContent>
@@ -182,11 +182,19 @@ const BankDetailsAccordion = ({ bankDetails }: { bankDetails: BankDetails }) => 
 const BankItem = ({ label, value }: { label: string; value: string }) => (
   <div className="flex justify-between">
     <span className="text-muted-foreground">{label}</span>
-    <span className="text-foreground font-medium">{value}</span>
+    <span className="text-foreground font-medium">
+      <CopyButton className="h-min p-0" value={value}>
+        {value}
+      </CopyButton>
+    </span>
   </div>
 )
 
-const VABankDetailsAccordion = ({ vaBankDetails }: { vaBankDetails: VABankDetails }) => (
+const VABankDetailsAccordion = ({
+  accountResponse,
+}: {
+  accountResponse: AccountResponseById
+}) => (
   <Accordion type="single" collapsible className="w-full">
     <AccordionItem value="va-bank-details">
       <AccordionTrigger>VA Bank Details</AccordionTrigger>
@@ -194,9 +202,14 @@ const VABankDetailsAccordion = ({ vaBankDetails }: { vaBankDetails: VABankDetail
         <div className="space-y-3">
           <VABankItem
             label="Account Number"
-            value={vaBankDetails?.account_number ?? '-'}
+            value={
+              accountResponse?.wallet_bank_details?.[0]?.accountNumber ?? '-'
+            }
           />
-          <VABankItem label="IFSC" value={vaBankDetails?.ifsc ?? '-'} />
+          <VABankItem
+            label="IFSC"
+            value={accountResponse?.wallet_bank_details?.[0]?.ifsc ?? '-'}
+          />
         </div>
       </AccordionContent>
     </AccordionItem>
@@ -206,11 +219,19 @@ const VABankDetailsAccordion = ({ vaBankDetails }: { vaBankDetails: VABankDetail
 const VABankItem = ({ label, value }: { label: string; value: string }) => (
   <div className="flex justify-between">
     <span className="text-muted-foreground">{label ? label : '-'}</span>
-    <span className="text-foreground font-medium">{value ? value : '-'}</span>
+    <span className="text-foreground font-medium">
+      <CopyButton className="h-min p-0" value={value}>
+        {value ? value : '-'}
+      </CopyButton>
+    </span>
   </div>
 )
 
-const WalletDetailsAccordion = ({ walletDetails }: { walletDetails: WalletDetails }) => (
+const WalletDetailsAccordion = ({
+  accountResponse,
+}: {
+  accountResponse: AccountResponseById
+}) => (
   <Accordion type="single" collapsible className="w-full">
     <AccordionItem value="wallet-details">
       <AccordionTrigger>Wallet Details</AccordionTrigger>
@@ -218,23 +239,25 @@ const WalletDetailsAccordion = ({ walletDetails }: { walletDetails: WalletDetail
         <div className="space-y-3">
           <WalletItem
             label="Vendor Name"
-            value={walletDetails?.vendor_name ?? '-'}
+            value={accountResponse?.wallet_details?.vendor_name ?? '-'}
           />
           <WalletItem
             label="Provider Name"
-            value={walletDetails?.provider_name ?? '-'}
+            value={accountResponse?.wallet_details?.provider_name ?? '-'}
           />
           <WalletItem
             label="Migrated"
-            value={walletDetails?.migrated ? 'True' : 'False'}
+            value={accountResponse?.wallet_details?.migrated ? 'True' : 'False'}
           />
           <WalletItem
             label="Acknowledged"
-            value={walletDetails?.acknowledged ? 'True' : 'False'}
+            value={
+              accountResponse?.wallet_details?.acknowledged ? 'True' : 'False'
+            }
           />
           <WalletItem
             label="Acknowledged At"
-            value={walletDetails?.acknowledged_at ?? '-'}
+            value={accountResponse?.wallet_details?.acknowledged_at ?? '-'}
           />
         </div>
       </AccordionContent>
@@ -245,7 +268,11 @@ const WalletDetailsAccordion = ({ walletDetails }: { walletDetails: WalletDetail
 const WalletItem = ({ label, value }: { label: string; value: string }) => (
   <div className="flex justify-between">
     <span className="text-muted-foreground">{label}</span>
-    <span className="text-foreground font-medium">{value}</span>
+    <span className="text-foreground font-medium">
+      <CopyButton className="h-min p-0" value={value}>
+        {value}
+      </CopyButton>
+    </span>
   </div>
 )
 
@@ -275,7 +302,11 @@ const SummaryItem = ({
 }) => (
   <div className="flex justify-between">
     <span>{title}</span>
-    <span className={valueClass}>{value}</span>
+    <span className={valueClass}>
+      <CopyButton className="h-min p-0" value={value}>
+        {value}
+      </CopyButton>
+    </span>
   </div>
 )
 
@@ -283,7 +314,6 @@ const AccountDetailsPage = () => {
   const params = useParams()
   const slug = params?.slug as string
   const { toast } = useToast()
-
   const [addCoins, setAddCoins] = useState<string>('')
   const [isLoadingAddCoins, setIsLoadingAddCoins] = useState(false)
   const [openAddFundsModal, setOpenAddFundsModal] = useState(false)
@@ -295,10 +325,10 @@ const AccountDetailsPage = () => {
   ] = useState(false)
 
   const {
-    data: accountDetails,
-    isLoading,
+    data: accountResponse,
+    isLoading, 
     refetch,
-  } = useQuery<AccountDetails | null>({
+  } = useQuery<AccountResponseById>({
     queryKey: ['account', slug],
     queryFn: async () => {
       const parts = slug?.split('-')
@@ -308,7 +338,7 @@ const AccountDetailsPage = () => {
       if (accountType && accountId) {
         return await getAccount(accountType, accountId)
       }
-      return null
+      throw new Error('Invalid slug')
     },
     enabled: !!slug,
   })
@@ -316,11 +346,11 @@ const AccountDetailsPage = () => {
   const handleAddCoins = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoadingAddCoins(true)
-    if (accountDetails?.wallet_id) {
+    if (accountResponse?.wallet_id) {
       try {
         const response = await manualCoinTransfer(
           Number(addCoins),
-          accountDetails.account_id
+          accountResponse?.account_id
         )
         if (response?.status === 201) {
           refetch()
@@ -349,7 +379,9 @@ const AccountDetailsPage = () => {
   }
 
   if (isLoading) return <div>Loading...</div>
-  if (!accountDetails) return <div>No account details found</div>
+  if (!accountResponse || !accountResponse) return <div>No account details found</div>
+
+  const accountData = accountResponse
 
   return (
     <div className="flex flex-col rounded-lg md:flex-row justify-between w-full relative text-foreground">
@@ -357,23 +389,17 @@ const AccountDetailsPage = () => {
         <div>
           <h2 className="text-xl mb-2">
             Account ID:{' '}
-            <span className="text-primary">{slug.split('-')[1] ?? '-'}</span>
+            <span className="text-primary">
+              {accountData?.gui_account_id ?? '-'}
+            </span>
           </h2>
         </div>
 
-        <ContactAccordion contact={accountDetails?.contact as Contact} />
-
-        <IdentityAccordion identity={accountDetails?.identity as Identity} />
-
-        <BankDetailsAccordion bankDetails={accountDetails?.bank_details as BankDetails} />
-
-        <VABankDetailsAccordion
-          vaBankDetails={accountDetails?.va_bank_details as VABankDetails}
-        />
-
-        <WalletDetailsAccordion
-          walletDetails={accountDetails?.wallet_details as WalletDetails}
-        />
+        <ContactAccordion accountResponse={accountData} />
+        <IdentityAccordion accountResponse={accountData} />
+        <BankDetailsAccordion accountResponse={accountData} />
+        <VABankDetailsAccordion accountResponse={accountData} />
+        <WalletDetailsAccordion accountResponse={accountData} />
 
         <div className="mt-8">
           <h3 className="text-lg mb-4">Funds</h3>
@@ -381,37 +407,37 @@ const AccountDetailsPage = () => {
             <FundItem
               title="Total PE Investment"
               value={`₹ ${
-                accountDetails?.aroh_user_funds?.total_investment ?? '0'
+                accountData?.user_funds?.total_investment ?? '-'
               }`}
             />
             <FundItem
               title="Current Value"
-              value={`₹ ${
-                accountDetails?.aroh_user_funds?.current_value ?? '0'
-              }`}
+              value={`₹ ${accountData?.user_funds?.current_value ?? '-'}`}
             />
             <FundItem
               title="PNL"
-              value={accountDetails?.user_funds?.pnl ?? '0'}
+              value={`₹ ${accountData?.user_funds?.pnl ?? '-'}`}
             />
             <FundItem
               title="PNL Percentage"
-              value={`${accountDetails?.user_funds?.pnl_percentage ?? '0'}%`}
+              value={`${accountData?.user_funds?.pnl_percentage ?? '-'}%`}
             />
             <FundItem
               title="Current Value"
-              value={`₹ ${accountDetails?.user_funds?.current_value ?? '0'}`}
+              value={`₹ ${accountData?.user_funds?.current_value ?? '-'}`}
               colSpan={2}
             />
             <FundItem
               title="Accrued Returns"
               value={`₹ ${
-                accountDetails?.aroh_user_funds?.accrued_returns ?? '0'
+                accountData?.aroh_user_funds?.accrued_returns ?? '-'
               }`}
             />
             <FundItem
               title="Total Investment"
-              value={`₹ ${accountDetails?.user_funds?.total_investment ?? '0'}`}
+              value={`₹ ${
+                accountData?.user_funds?.total_investment ?? '-'
+              }`}
               colSpan={2}
             />
           </div>
@@ -426,20 +452,20 @@ const AccountDetailsPage = () => {
           <div className="space-y-2">
             <SummaryItem
               title="Balance"
-              value={`₹${accountDetails?.user_funds?.balance ?? '0'}`}
+              value={`₹${accountData?.user_funds?.balance ?? '-'}`}
             />
             <SummaryItem
               title="Withdrawable"
-              value={`₹${accountDetails?.wallet_withdraw_amount ?? '0'}`}
+              value={`₹${accountData?.wallet_withdraw_amount ?? '-'}`}
             />
             <SummaryItem
               title="Coins"
-              value={accountDetails?.coins?.toString() ?? '0'}
+              value={accountData?.coins?.toString() ?? '-'}
             />
             <SummaryItem
               title="Approval Status"
-              value={accountDetails?.status ?? 'Unknown'}
-              valueClass="text-accent"
+              value={accountData?.status ?? '-'}
+              valueClass=""
             />
           </div>
           <div className="space-y-2">
@@ -487,24 +513,22 @@ const AccountDetailsPage = () => {
         openAddFundsModal={openAddFundsModal}
         setOpenAddFundsModal={setOpenAddFundsModal}
         getAccountRefetch={refetch}
-        decentroWalletId={accountDetails?.decentro_wallet_id ?? ''}
-        accountId={accountDetails?.account_id}
+        decentroWalletId={accountData?.decentro_wallet_id ?? ''}
+        accountId={accountData?.account_id ?? ''}
       />
       <CreateAWithdrawTransaction
-        accountId={accountDetails?.account_id}
-        balance={accountDetails?.wallet_balance}
+        accountId={accountData?.account_id ?? ''}
+        balance={accountData?.wallet_balance ?? ''}
         openWithdrawTransactionModal={openWithdrawTransactionModal}
         setOpenWithdrawTransactionModal={setOpenWithdrawTransactionModal}
         refetch={refetch}
       />
       <CreateCoinWithdrawTransaction
         openCoinWithdrawTransactionModal={openCoinWithdrawTransactionModal}
-        setOpenCoinWithdrawTransactionModal={
-          setOpenCoinWithdrawTransactionModal
-        }
-        accountId={accountDetails.account_id}
+        setOpenCoinWithdrawTransactionModal={setOpenCoinWithdrawTransactionModal}
+        accountId={accountData?.account_id ?? ''}
         refetch={refetch}
-        coinBalance={accountDetails.coins}
+        coinBalance={accountData?.coins ?? 0}
       />
     </div>
   )
