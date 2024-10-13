@@ -31,7 +31,6 @@ interface ConfirmationModal {
 }
 
 const ConfirmationModal = ({
-    
   openConfirmationModal,
   setOpenConfirmationModal,
   sold,

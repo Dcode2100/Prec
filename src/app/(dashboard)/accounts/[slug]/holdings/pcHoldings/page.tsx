@@ -1,57 +1,125 @@
 'use client'
-import React, { useMemo, useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { useParams } from 'next/navigation'
-import { getPCHoldingsByAccId } from '@/lib/api/accountApi'
-import AccountTable from '@/components/accountTable/AccountTable'
-import { pcHoldingsByIdToTableRows } from '@/utils/utils'
-import { PCHoldingById } from '@/lib/types/getPCHoldingByIdType'
-import { AccountWisePcHoldingData } from '@/lib/types/types'
-import moment from 'moment'
-import { CSVLink } from 'react-csv'
 import { Button } from '@/components/ui/button'
+import { DataTable } from '@/components/CustomTable/data-table'
+import { getPCHoldingsByAccId } from '@/lib/api/accountApi'
+import { getNumberInRupee } from '@/utils/utils'
+import { ColumnDef } from '@tanstack/react-table'
+import { DataTableColumnHeader } from '@/components/CustomTable/data-table-column-header'
+import { CSVLink } from 'react-csv'
+import moment from 'moment'
+import { AccountWisePcHoldingData } from '@/lib/types/types'
 
 const PCHoldingsTable = (): React.ReactElement => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [currentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
+
   const { slug } = useParams()
   const slugString = Array.isArray(slug) ? slug[0] : slug
   const parts = slugString.split('-')
-  // const accountType = parts[0]
   const accountId = parts.slice(1).join('-')
 
-  const [page, setPage] = useState(1)
-  const [isLoading, setIsLoading] = useState(false)
-  const limit = 20
-  const [SelectedPCHoldingsData, setSelectedPCHoldingsData] = useState<
-    AccountWisePcHoldingData[]
-  >([])
   const accountHoldingsQuery = useQuery({
-    queryKey: ['pc_acc_holdings', accountId],
+    queryKey: ['pc_acc_holdings', accountId, currentPage, itemsPerPage],
     queryFn: async () => {
       try {
-        const holdingPCData = await getPCHoldingsByAccId(accountId)
-        setSelectedPCHoldingsData(holdingPCData)
-        return holdingPCData
+        setIsLoading(true)
+        return await getPCHoldingsByAccId(accountId)
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           return
         }
         throw error
+      } finally {
+        setIsLoading(false)
       }
     },
   })
 
-  useEffect(() => {
-    if (accountHoldingsQuery?.isLoading) {
-      setIsLoading(true)
-    } else {
-      setIsLoading(false)
-    }
-  }, [accountHoldingsQuery?.isLoading])
-
-  const pcHoldings = useMemo(
-    () => accountHoldingsQuery?.data || ([] as PCHoldingById[]),
-    [accountHoldingsQuery?.data]
+  const columns: ColumnDef<AccountWisePcHoldingData>[] = useMemo(
+    () => [
+      {
+        accessorKey: 'gui_id',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Holding ID" />
+        ),
+        cell: ({ row }) => <div>{row.getValue('gui_id')}</div>,
+        enableSorting: false,
+      },
+      {
+        accessorKey: 'symbol',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Symbol" />
+        ),
+        cell: ({ row }) => <div>{row.getValue('symbol')}</div>,
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'rate_of_returns',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Returns" />
+        ),
+        cell: ({ row }) => <div>{row.getValue('rate_of_returns')}</div>,
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'tenure',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Tenure" />
+        ),
+        cell: ({ row }) => <div>{row.getValue('tenure')}</div>,
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'subscription_amount',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Subscription" />
+        ),
+        cell: ({ row }) => (
+          <div>{getNumberInRupee(row.getValue('subscription_amount'))}</div>
+        ),
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'min_repayment_amount',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Min Repayment" />
+        ),
+        cell: ({ row }) => (
+          <div>{getNumberInRupee(row.getValue('min_repayment_amount'))}</div>
+        ),
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'status',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Status" />
+        ),
+        cell: ({ row }) => <div>{row.getValue('status')}</div>,
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'tentative_end_date',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Maturity date" />
+        ),
+        cell: ({ row }) => <div>{row.getValue('tentative_end_date')}</div>,
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'created_at',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Created At" />
+        ),
+        cell: ({ row }) => <div>{row.getValue('created_at')}</div>,
+        enableSorting: true,
+      },
+    ],
+    []
   )
 
   const AccountPcHeaders = [
@@ -80,48 +148,32 @@ const PCHoldingsTable = (): React.ReactElement => {
     { label: 'Updated At', key: 'updated_at' },
   ]
 
-  const columns = [
-    { header: 'Holding ID', accessorKey: 'gui_id' },
-    { header: 'Symbol', accessorKey: 'symbol' },
-    { header: 'Returns', accessorKey: 'rate_of_returns' },
-    { header: 'Tenure', accessorKey: 'tenure' },
-    { header: 'Subscription', accessorKey: 'subscription_amount' },
-    { header: 'Min Repayment', accessorKey: 'min_repayment_amount' },
-    { header: 'Status', accessorKey: 'status' },
-    { header: 'Maturity date', accessorKey: 'tentative_end_date' },
-    { header: 'Created At', accessorKey: 'created_at' },
-  ]
-
-  const tableData = useMemo(() => {
-    if (!accountHoldingsQuery.data) return []
-    return pcHoldingsByIdToTableRows(accountHoldingsQuery.data)
-  }, [accountHoldingsQuery.data])
-
   return (
     <>
-      <div className="items-center flex justify-between px-2">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg tracking-tight">PC Holdings</h2>
         <CSVLink
-          data={SelectedPCHoldingsData}
-          filename={`AccountsData_${moment(new Date()).format(
-            'MMMM Do YYYY, h:mm:ss a'
+          data={accountHoldingsQuery?.data || []}
+          filename={`PCHoldingsData_${moment(new Date()).format(
+            'MMMM_Do_YYYY_h_mm_ss_a'
           )}.csv`}
           headers={AccountPcHeaders}
         >
-          <Button className="mr-200" disabled={!SelectedPCHoldingsData.length}>
+          <Button disabled={!accountHoldingsQuery?.data?.length}>
             Export CSV
           </Button>
         </CSVLink>
       </div>
-      <AccountTable
-        isSearchable={false}
+
+      <DataTable
         columns={columns}
-        data={pcHoldings}
-        totalItems={tableData.length}
-        itemsPerPage={limit}
-        currentPage={page}
-        onPageChange={setPage}
+        data={accountHoldingsQuery?.data || []}
+        page={currentPage}
+        limit={itemsPerPage}
+        total={accountHoldingsQuery?.data?.length || 0}
         isLoading={isLoading}
+        onPageChange={() => {}}
+        onRowChange={() => {}}
       />
     </>
   )

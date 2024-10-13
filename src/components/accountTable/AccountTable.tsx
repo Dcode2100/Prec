@@ -161,11 +161,6 @@ function AccountTable<T extends object>({
       return 'text-yellow-500'
     if (['rejected', 'failed', 'cancelled'].includes(lowerValue))
       return 'text-red-500'
-    if (header.toLowerCase() === 'type') {
-      if (value === 'Broking') return 'text-orange-500'
-      if (value === 'MF') return 'text-blue-500'
-      if (value === 'PE') return 'text-purple-500'
-    }
     return ''
   }
   const renderStatus = (status: string) => {
@@ -322,7 +317,7 @@ function AccountTable<T extends object>({
                   </div>
                 </TableCell>
               </TableRow>
-            ) : sortedData.length === 0 ? (
+            ) : sortedData?.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={
@@ -336,10 +331,10 @@ function AccountTable<T extends object>({
                 </TableCell>
               </TableRow>
             ) : (
-              sortedData.map((row, rowIndex) => (
+              sortedData?.map((row, rowIndex) => (
                 <TableRow
                   key={rowIndex}
-                  onClick={() => onrowClick(row)}
+                  onClick={() => onRowClick?.(row)}
                   className="cursor-pointer hover:bg-muted/50"
                 >
                   {columns.map((column, colIndex) => (
@@ -347,7 +342,7 @@ function AccountTable<T extends object>({
                       key={column.accessorKey as string}
                       className={cn(
                         getItemColor(row[column.accessorKey], column.header),
-                        'relative pr-8' // Added right padding for copy icon
+                        'relative pr-8' 
                       )}
                       style={{
                         width:

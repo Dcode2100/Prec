@@ -27,8 +27,8 @@ import { getGlobalItem } from "@/utils/utils";
 // import NSEInvoice from "../pdf/NSEInvoice";
 import Link from "next/link";
 // import colors from "../theme/colors";
-// import RefundModal from "@/components/modals/RefundModal";
 import moment from "moment";
+import RefundModal from "../modals/RefundModalPE";
 
 interface OrderDetailsProps {
   isOpen: boolean;
@@ -60,10 +60,10 @@ const OrderDetails = (props: OrderDetailsProps): React.ReactElement => {
 
   const [isOpenRefundModal, setIsOpenRefundModal] = useState<boolean>(false);
 
-  const orderDetailsQuery = useQuery(
-    ["order_details", order_id],
-    fetchOrderDetails
-  );
+  const orderDetailsQuery = useQuery({
+    queryKey: ['order_details', order_id],
+    queryFn: fetchOrderDetails,
+  })
 
   const order = orderDetailsQuery.data;
   const transferable = order?.data?.transferable;
@@ -280,8 +280,7 @@ const OrderDetails = (props: OrderDetailsProps): React.ReactElement => {
           setOpenRefundModal={setIsOpenRefundModal}
           order_id={order_id}
           transactionAmount={+order?.data?.purchase_value}
-          dataUpdate={props?.dataUpdate}
-          setDataUpdate={props?.setDataUpdate}
+          refetch={orderDetailsQuery.refetch}
           onClose={props.onClose}
         />
         <SheetHeader>
@@ -297,7 +296,6 @@ const OrderDetails = (props: OrderDetailsProps): React.ReactElement => {
               href={`/accounts/PE/${order?.data?.account_id}`}
               className={cn(
                 "bg-yellow-500 text-bg-dark px-2 py-1 rounded-md",
-                colors.yellow,
                 "px-2 py-1 rounded-md"
               )}
             >
@@ -311,20 +309,6 @@ const OrderDetails = (props: OrderDetailsProps): React.ReactElement => {
           {copyDetail("Account Email", order?.data?.email)}
           {copyDetail("Demat Account Number", order?.data?.bo_id)}
           {copyDetail("Mobile", order?.data?.mobile)}
-          {router?.pathname === "/delivery_journey/" && (
-            <Separator className="my-4" />
-          )}
-          {router?.pathname === "/delivery_journey/" &&
-            copyDetail(
-              "Account Number",
-              order?.data?.bank_details[0]?.account_number
-            )}
-          {router?.pathname === "/delivery_journey/" &&
-            copyDetail("IFSC Code", order?.data?.bank_details[0]?.ifsc)}
-          {router?.pathname === "/delivery_journey/" &&
-            copyDetail("Bank Name", order?.data?.bank_details[0]?.bank_name)}
-          {router?.pathname === "/delivery_journey/" &&
-            copyDetail("Branch Name", order?.data?.bank_details[0]?.branch)}
           <Separator className="my-4" />
           {orderDetail("Token", order?.data?.token)}
           {orderDetail("Symbol", order?.data?.symbol)}

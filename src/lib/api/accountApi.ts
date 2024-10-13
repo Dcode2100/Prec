@@ -2,6 +2,7 @@ import axiosInstance, { setInstance } from '@/lib/api/axiosInstance'
 import { getGlobalItem } from '@/utils/utils'
 import {
   AccountResponse,
+  AccountWiseHoldingData,
   GenericResponse,
   PeFundsDataInterface,
   WalletTransactionsParams,
@@ -88,18 +89,19 @@ export const getAccountFunds = async (accountId: string) => {
   return res.data?.data
 }
 
-export const getAccountHoldings = async (accountId: string, type: string) => {
-  const isAffiliate = getGlobalItem('isAffiliate')
+interface AccountHoldingsResponse {
+  type: string
+  holdings: AccountWiseHoldingData[]
+}
 
-  const res = isAffiliate
-    ? await axiosInstance.get<GenericResponse<AccountHoldingsResponse>>(
-        `/dashboard/nominatorDashboard/accounts/${type}/${accountId}/holdings`
-      )
-    : await axiosInstance.get<GenericResponse<AccountHoldingsResponse>>(
-        `/dashboard/accounts/${type}/${accountId}/holdings`
-      )
-
-  return res.data?.data?.holdings
+export const getAccountHoldings = async (
+  accountId: string,
+  type: string
+): Promise<AccountWiseHoldingData[]> => {
+  const response = await axiosInstance.get<AccountHoldingsResponse>(
+    `/dashboard/accounts/${type}/${accountId}/holdings`
+  )
+  return response.data.data.holdings
 }
 
 export const getAccountWishlist = async (
@@ -238,9 +240,12 @@ export const createVirtualAccount = async (accountId: string): Promise<any> => {
 
 // New interfaces
 interface AccountHoldingsResponse {
-  holdings: AccountHolding[]
+  message: string
+  data: {
+    type: string
+    holdings: AccountWiseHoldingData[]
+  }
 }
-
 interface AccountHolding {
   holding_id: string
   token: string

@@ -77,7 +77,7 @@ const validationSchema = Yup.object().shape({
 })
 
 const InputField = ({
-  name,
+  name ,
   label,
   type = 'text',
   placeholder,

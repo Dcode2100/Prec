@@ -159,10 +159,6 @@ const NominatorsPage = () => {
         <DataTable
           columns={getColumns() as ColumnDef<NominatorResponse>[]}
           data={getFilteredData()}
-          enableSearch={true}
-          enableDropdown={false}
-          search={search}
-          onSearchChange={setSearch}
           page={pagination.common.page}
           limit={pagination.common.limit}
           onPageChange={(page) => {
@@ -177,12 +173,8 @@ const NominatorsPage = () => {
               common: { ...prev.common, limit },
             }))
           }}
-          filter={''}
-          onChangeFilter={() => {}}
-          selectOptions={selectOptions}
           total={nominators?.total || 0}
           isLoading={isLoading}
-          refetch={() => {}}
           onRowClick={(row) => {
             router.push(`/nominators/${row.nominator_id}`)
           }}

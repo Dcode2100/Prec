@@ -125,3 +125,56 @@ interface AccountResponseById {
 }
 
 export type { AccountResponseById }
+
+
+export interface AccountWiseHoldingData {
+  id: string
+  token: string
+  asset_id: string
+  symbol: string
+  company_pan: string | null
+  quantity: number
+  price: string
+  amount: string
+  buy_quantity: number
+  buy_amount: string
+  sell_quantity: number
+  sell_price: string
+  sell_amount: string
+  sold: boolean
+  curr_price: string
+  curr_value: string
+  pnl: string
+  pnl_percentage: string
+  buy_transaction_fees: string
+  sell_transaction_fees: string
+  show_on_portal: boolean
+}
+export interface AccountWisePcHoldingData {
+  asset_id: string
+  gui_id: string
+  symbol: string
+  logo: string
+  logo_mark: string
+  mobile_logo: string
+  status: string
+  ui_rate_of_returns: number
+  rate_of_returns: number
+  tenure: number
+  tentative_tenure: number
+  subscription_amount: string
+  min_repayment_amount: string
+  start_date: string
+  end_date: string
+  trade_start_date: string
+  trade_end_date: string
+  tentative_start_date: string
+  tentative_end_date: string
+  returns: string
+  charges: string
+  to: string
+  from: string
+  buy_transaction_fees: string
+  created_at: string
+  updated_at: string
+}

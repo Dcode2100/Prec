@@ -2,161 +2,198 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import AccountTable from '@/components/accountTable/AccountTable'
-import { getAccountHoldings } from '@/lib/api/accountApi'
-import { getNumberInRupee } from '@/utils/utils'
-import { AccountWiseHoldingData } from '@/lib/types/types'
 import { useParams } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { DataTable } from '@/components/CustomTable/data-table'
+import { getAccountHoldings } from '@/lib/api/accountApi'
+import { getNumberInRupee, getGlobalItem } from '@/utils/utils'
 import ConfirmationModal from '@/components/modals/ConfirmationModal'
 import ApplyRightsIssueModal from '@/components/modals/ApplyRightsIssueModal'
 import TransferHoldingModal from '@/components/modals/TransferHoldingModal'
-import { Button } from '@/components/ui/button'
-import { useSelector } from 'react-redux'
+import { ColumnDef } from '@tanstack/react-table'
+import { DataTableColumnHeader } from '@/components/CustomTable/data-table-column-header'
 import { CSVLink } from 'react-csv'
 import moment from 'moment'
-import { ColumnTable } from '@/lib/types'
+import { AccountWiseHoldingData } from '@/lib/types/accountType'
 
-const HoldingsPage = () => {
+const HoldingsTable = (): React.ReactElement => {
+  const [isLoading, setIsLoading] = useState(false)
+  const userType = getGlobalItem('type')
+  const [openConfirmationModal, setOpenConfirmationModal] =
+    useState<boolean>(false)
+  const [openApplyRightsIssueModal, setOpenApplyRightsIssueModal] =
+    useState<boolean>(false)
+  const [openTransferModal, setOpenTransferModal] = useState<boolean>(false)
+  const [transferSuccessful, setTransferSuccessful] = useState(false)
+  const [holdingId, setHoldingId] = useState<string>('')
+  const [currentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
+
   const { slug } = useParams()
   const slugString = Array.isArray(slug) ? slug[0] : slug
   const parts = slugString.split('-')
-  const accountType = parts[0]
   const accountId = parts.slice(1).join('-')
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
-  const [selectedHoldingId, setSelectedHoldingId] = useState<string>('')
-
-  const userType = useSelector(
-    (state: { user: { userType: string } }) => state.user.userType
-  )
-  const [SelectedHoldingsData, setSelectedHoldingsData] = useState<
-    AccountWiseHoldingData[]
-  >([])
-  const { data, isLoading } = useQuery({
-    queryKey: ['holdings', accountId, accountType],
+  const accountHoldingsQuery = useQuery({
+    queryKey: [
+      'PE-holdings',
+      accountId,
+      transferSuccessful,
+      currentPage,
+      itemsPerPage,
+    ],
     queryFn: async () => {
       try {
-        const holdings = await getAccountHoldings(accountId, accountType)
-        setSelectedHoldingsData(holdings as AccountWiseHoldingData[])
-        return holdings
+        setIsLoading(true)
+        return await getAccountHoldings(accountId, 'PE')
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
-          return []
+          return
         }
         throw error
+      } finally {
+        setIsLoading(false)
       }
     },
   })
 
-  const columns = useMemo(
+  const handleTransferSuccess = () => {
+    setTransferSuccessful((prev) => !prev)
+    setOpenTransferModal(false)
+  }
+
+  const columns: ColumnDef<AccountWiseHoldingData>[] = useMemo(
     () => [
-      { header: 'Token', accessorKey: 'token', sortable: true },
       {
-        header: 'Symbol',
+        accessorKey: 'token',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Token" />
+        ),
+        cell: ({ row }) => <div>{row.getValue('token')}</div>,
+        enableSorting: true,
+      },
+      {
         accessorKey: 'symbol',
-        cell: (value: string) => value.split('-')[0],
-        sortable: true,
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Symbol" />
+        ),
+        cell: ({ row }) => (
+          <div>{(row.getValue('symbol') as string).split('-')[0]}</div>
+        ),
+        enableSorting: true,
       },
-      { header: 'Quantity', accessorKey: 'quantity', sortable: true },
       {
-        header: 'Price',
+        accessorKey: 'quantity',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Quantity" />
+        ),
+        cell: ({ row }) => <div>{String(row.getValue('quantity'))}</div>,
+        enableSorting: true,
+      },
+      {
         accessorKey: 'price',
-        cell: (value: number) => getNumberInRupee(value, true),
-        sortable: true,
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Price" />
+        ),
+        cell: ({ row }) => (
+          <div>{getNumberInRupee(row.getValue('price'), true)}</div>
+        ),
+        enableSorting: true,
       },
       {
-        header: 'Investment',
         accessorKey: 'investment',
-        cell: (row: { price: number; quantity: number }) =>
-          getNumberInRupee(row.price * row.quantity),
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Investment" />
+        ),
+        cell: ({ row }) => (
+          <div>
+            {getNumberInRupee(
+              Number(row.original.price) * Number(row.original.quantity)
+            )}
+          </div>
+        ),
+        enableSorting: true,
       },
-      { header: 'LTP', accessorKey: 'curr_price' },
       {
-        header: 'PNL',
+        accessorKey: 'curr_price',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="LTP" />
+        ),
+        cell: ({ row }) => <div>{row.getValue('curr_price')}</div>,
+        enableSorting: true,
+      },
+      {
         accessorKey: 'pnl',
-        cell: (value: number) => getNumberInRupee(value),
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="PNL" />
+        ),
+        cell: ({ row }) => <div>{getNumberInRupee(row.getValue('pnl'))}</div>,
+        enableSorting: true,
       },
       {
-        header: 'Percentage PNL',
         accessorKey: 'pnl_percentage',
-        cell: (value: number) => `${value}%`,
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Percentage PNL" />
+        ),
+        cell: ({ row }) => <div>{`${row.getValue('pnl_percentage')}%`}</div>,
+        enableSorting: true,
       },
       {
+        id: 'transfer',
         header: 'Transfer Holding',
-        accessorKey: 'transfer',
-        cell: (row: { id: string; sold: boolean }) => (
+        cell: ({ row }) => (
           <Button
-            disabled={row?.sold}
             variant="outline"
-            size="sm"
-            onClick={() => openTransferHoldingModal(row?.id)}
+            disabled={row.original.sold === true}
+            onClick={() => {
+              setHoldingId(row.original.id)
+              setOpenTransferModal(true)
+            }}
           >
             Transfer
           </Button>
         ),
       },
       {
-        header: 'Update Holding',
-        accessorKey: 'update',
-        cell: (row: { id: string; sold: boolean }) =>
-          row?.sold ? (
-            <p className="text-red-500">Sold</p>
+        id: 'update',
+        header: 'Update holding',
+        cell: ({ row }) =>
+          row.original.sold ? (
+            <span className="text-red-500 w-full border-red-500">Sold</span>
           ) : (
             <Button
               variant="outline"
-              size="sm"
-              onClick={() => openConfirmationModal(row?.id)}
+              onClick={() => {
+                setHoldingId(row.original.id)
+                setOpenConfirmationModal(true)
+              }}
             >
               Update
             </Button>
           ),
+        enableSorting: false,
       },
       {
-        header: 'Apply Rights Issue',
-        accessorKey: 'apply',
-        cell: (row: { id: string; sold: boolean }) => (
+        id: 'apply',
+        header: 'Apply rights issue',
+        cell: ({ row }) => (
           <Button
             variant="outline"
-            size="sm"
-            onClick={() => openApplyRightsIssueModal(row?.id)}
+            onClick={() => {
+              setHoldingId(row.original.id)
+              setOpenApplyRightsIssueModal(true)
+            }}
           >
             Apply
           </Button>
         ),
+        enableSorting: false,
       },
     ],
     [userType]
   )
 
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
-  const [isApplyRightsIssueModalOpen, setIsApplyRightsIssueModalOpen] =
-    useState(false)
-  const [isTransferHoldingModalOpen, setIsTransferHoldingModalOpen] =
-    useState(false)
-
-  const openConfirmationModal = (holdingId: string) => {
-    setSelectedHoldingId(holdingId)
-    setIsConfirmationModalOpen(true)
-  }
-
-  const openApplyRightsIssueModal = (holdingId: string) => {
-    setSelectedHoldingId(holdingId)
-    setIsApplyRightsIssueModalOpen(true)
-  }
-
-  const openTransferHoldingModal = (holdingId: string) => {
-    setSelectedHoldingId(holdingId)
-    setIsTransferHoldingModalOpen(true)
-  }
-
-  const closeTransferHoldingModal = () => setIsTransferHoldingModalOpen(false)
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
-
-  const ExportExcelAccountHeaders = [
+  const AccountHeaders = [
     { label: 'Token', key: 'token' },
     { label: 'Symbol', key: 'symbol' },
     { label: 'Net Quantity', key: 'quantity' },
@@ -178,54 +215,50 @@ const HoldingsPage = () => {
 
   return (
     <>
-      <div className="items-center flex justify-between px-2">
-        <h2 className="text-lg tracking-tight ">PE Holdings</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg tracking-tight">PE Holdings</h2>
         <CSVLink
-          data={SelectedHoldingsData}
-          filename={`AccountsData_${moment(new Date()).format(
-            'MMMM Do YYYY, h:mm:ss a'
+          data={accountHoldingsQuery?.data || []}
+          filename={`PEHoldingsData_${moment(new Date()).format(
+            'MMMM_Do_YYYY_h_mm_ss_a'
           )}.csv`}
-          headers={ExportExcelAccountHeaders}
+          headers={AccountHeaders}
         >
-          <Button className="mr-200" disabled={!SelectedHoldingsData.length}>
-            Export CSV
-          </Button>
+          <Button>Export</Button>
         </CSVLink>
       </div>
 
-      <AccountTable
-        isSearchable={false}
-        columns={columns as ColumnTable<AccountWiseHoldingData>[]}
-        data={data as AccountWiseHoldingData[]}
-        totalItems={data?.length || 0}
-        itemsPerPage={itemsPerPage}
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-        isLoading={isLoading}
-      />
-
       <ConfirmationModal
-        openConfirmationModal={isConfirmationModalOpen}
-        setOpenConfirmationModal={setIsConfirmationModalOpen}
-        holding_id={selectedHoldingId}
+        openConfirmationModal={openConfirmationModal}
+        setOpenConfirmationModal={setOpenConfirmationModal}
         sold={true}
+        holding_id={holdingId}
       />
-
       <ApplyRightsIssueModal
-        openApplyRightsIssueModal={isApplyRightsIssueModalOpen}
-        setOpenApplyRightsIssueModal={setIsApplyRightsIssueModalOpen}
-        holding_id={selectedHoldingId}
+        openApplyRightsIssueModal={openApplyRightsIssueModal}
+        setOpenApplyRightsIssueModal={setOpenApplyRightsIssueModal}
+        holding_id={holdingId}
         accountId={accountId}
       />
       <TransferHoldingModal
-        isOpen={isTransferHoldingModalOpen}
-        onClose={closeTransferHoldingModal}
-        holdingId={selectedHoldingId}
+        isOpen={openTransferModal}
+        onClose={() => setOpenTransferModal(false)}
+        holdingId={holdingId}
         sendersAccountId={accountId}
-        onTransferSuccess={() => {}}
+        onTransferSuccess={handleTransferSuccess}
+      />
+      <DataTable
+        columns={columns as ColumnDef<AccountWiseHoldingData>[]}
+        data={accountHoldingsQuery?.data || []}
+        page={currentPage}
+        limit={itemsPerPage}
+        total={accountHoldingsQuery?.data?.length || 0}
+        isLoading={isLoading}
+        onPageChange={() => {}}
+        onRowChange={() => {}}
       />
     </>
   )
 }
 
-export default HoldingsPage
+export default HoldingsTable

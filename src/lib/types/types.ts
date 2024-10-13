@@ -2484,29 +2484,27 @@ export interface GetAllDashboardOverview {
 }
 
 export interface AccountWiseHoldingData {
-  account_id: string
-  gui_account_id: string
-  holding_id: string
-  asset_id: string
+  id: string
   token: string
+  asset_id: string
   symbol: string
   company_pan: string | null
   quantity: number
   price: string
   amount: string
-  buy_transaction_fees: string
+  buy_quantity: number
+  buy_amount: string
   sell_quantity: number
   sell_price: string
   sell_amount: string
-  sell_transaction_fees: string
   sold: boolean
-  created_at: string
-  updated_at: string
-  email: string
-  first_name: string
-  middle_name: string
-  last_name: string
-  mobile: string
+  curr_price: string
+  curr_value: string
+  pnl: string
+  pnl_percentage: string
+  buy_transaction_fees: string
+  sell_transaction_fees: string
+  show_on_portal: boolean
 }
 
 export interface AccountWisePcHoldingData {

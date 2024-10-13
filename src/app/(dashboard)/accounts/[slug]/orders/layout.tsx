@@ -5,7 +5,7 @@ import CreateManualOrderModal from '@/components/sheets/CreateManualOrderDrawer'
 import CreatePCManualOrderModal from '@/components/sheets/CreatePCManualOrderDrawer'
 import { useParams, usePathname } from 'next/navigation'
 
-const Layout = ({ children }) => {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const params = useParams()
   const pathname = usePathname()

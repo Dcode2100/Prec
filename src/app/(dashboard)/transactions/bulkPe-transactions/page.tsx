@@ -42,8 +42,6 @@ const BulkPeTransactionPage = () => {
     dateFilterType: 'createdAt',
   })
 
-
-
   const getFilteredData = () => {
     return transactions?.transactions || []
   }
@@ -163,7 +161,11 @@ const BulkPeTransactionPage = () => {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {transactions && transactions.transactions.length > 0 && (
-            <Button variant="outline" size="sm" className="h-8 flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 flex items-center gap-2"
+            >
               <Sheet size={16} />
               <CSVLink
                 data={transactions.transactions}
@@ -172,7 +174,7 @@ const BulkPeTransactionPage = () => {
                 )}.csv`}
                 headers={headers}
               >
-                Export 
+                Export
               </CSVLink>
             </Button>
           )}
@@ -202,8 +204,6 @@ const BulkPeTransactionPage = () => {
         <DataTable
           columns={getColumns() as ColumnDef<BulkPeTransaction>[]}
           data={getFilteredData()}
-          enableSearch={false}
-          enableDropdown={false}
           page={pagination.common.page}
           limit={pagination.common.limit}
           onPageChange={(page) => {
@@ -218,11 +218,8 @@ const BulkPeTransactionPage = () => {
               common: { ...prev.common, limit },
             }))
           }}
-          filter={''}
-          onChangeFilter={() => {}}
           total={transactions?.total || 0}
           isLoading={isLoading}
-          refetch={() => {}}
           onRowClick={() => {}}
         />
       </div>

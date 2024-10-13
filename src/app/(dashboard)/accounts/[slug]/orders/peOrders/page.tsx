@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-// import { OrderDetails } from '@/components/OrderDetails';
+import OrderDetails from '@/components/sheets/OrderDetails'
 import { getOrdersByAccountId } from '@/lib/api/ordersApi'
 import { CSVLink } from 'react-csv'
 import { getGlobalItem } from '@/utils/utils'
@@ -55,6 +55,7 @@ const PeBuyOrdersTable = (): React.ReactElement => {
   const accountId = parts.slice(1).join('-')
 
   const [selectedOrder, setSelectedOrder] = useState<string | undefined>()
+  const [dataUpdate, setDataUpdate] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>('All')
   const [companyFilter, setCompanyFilter] = useState<string>('All')
   const [qtyFilterType, setQtyFilterType] = useState<string>('between')
@@ -113,7 +114,7 @@ const PeBuyOrdersTable = (): React.ReactElement => {
 
   const orders = data?.orders || []
   const totalItems = data?.total || 0
-  const transferable = false;
+  const transferable = false
   const peStatusOptions = !transferable
     ? {
         VERIFICATION_PENDING: 'Verification Pending',
@@ -131,7 +132,7 @@ const PeBuyOrdersTable = (): React.ReactElement => {
         INVALID: 'Invalid',
       }
 
-  const columns : ColumnTable<OrderResponse>[] = [
+  const columns: ColumnTable<OrderResponse>[] = [
     { header: 'Order ID', accessorKey: 'gui_order_id' },
     { header: 'Account ID', accessorKey: 'gui_account_id' },
     { header: 'Side', accessorKey: 'side' },
@@ -142,14 +143,15 @@ const PeBuyOrdersTable = (): React.ReactElement => {
       header: 'Status',
       accessorKey: 'status',
       cell: ({ getValue }) => {
-        const status = getValue() as keyof typeof peStatusOptions;
-        return peStatusOptions[status] || status;
+        const status = getValue() as keyof typeof peStatusOptions
+        return peStatusOptions[status] || status
       },
     },
     {
       header: 'Created At',
       accessorKey: 'created_at',
-      cell: ({getValue}) => moment(getValue() as string).format('YYYY-MM-DD HH:mm:ss'),
+      cell: ({ getValue }) =>
+        moment(getValue() as string).format('YYYY-MM-DD HH:mm:ss'),
     },
   ]
 
@@ -223,7 +225,6 @@ const PeBuyOrdersTable = (): React.ReactElement => {
     }
   }
 
-
   return (
     <>
       {/* {selectedOrder && (
@@ -263,7 +264,10 @@ const PeBuyOrdersTable = (): React.ReactElement => {
           <div className="mt-4 space-y-4">
             <div className="space-y-2">
               <Label>Company Name</Label>
-              <Select onValueChange={setTempCompanyFilter} value={tempCompanyFilter}>
+              <Select
+                onValueChange={setTempCompanyFilter}
+                value={tempCompanyFilter}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select company" />
                 </SelectTrigger>
@@ -284,8 +288,12 @@ const PeBuyOrdersTable = (): React.ReactElement => {
                   <SelectValue placeholder="Select filter type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="greater_than_equal_to">Greater Than or Equal To</SelectItem>
-                  <SelectItem value="less_than_equal_to">Less Than or Equal To</SelectItem>
+                  <SelectItem value="greater_than_equal_to">
+                    Greater Than or Equal To
+                  </SelectItem>
+                  <SelectItem value="less_than_equal_to">
+                    Less Than or Equal To
+                  </SelectItem>
                   <SelectItem value="equal">Equal</SelectItem>
                   <SelectItem value="between">Between</SelectItem>
                 </SelectContent>
@@ -295,16 +303,27 @@ const PeBuyOrdersTable = (): React.ReactElement => {
                   <Input
                     type="number"
                     value={tempQtyStart}
-                    onChange={(e) => handleQtyFilterChange([parseInt(e.target.value), tempQtyEnd])}
+                    onChange={(e) =>
+                      handleQtyFilterChange([
+                        parseInt(e.target.value),
+                        tempQtyEnd,
+                      ])
+                    }
                     className="w-20"
                   />
                 )}
                 {qtyFilterType === 'between' && <span>to</span>}
-                {(qtyFilterType === 'less_than_equal_to' || qtyFilterType === 'between') && (
+                {(qtyFilterType === 'less_than_equal_to' ||
+                  qtyFilterType === 'between') && (
                   <Input
                     type="number"
                     value={tempQtyEnd}
-                    onChange={(e) => handleQtyFilterChange([tempQtyStart, parseInt(e.target.value)])}
+                    onChange={(e) =>
+                      handleQtyFilterChange([
+                        tempQtyStart,
+                        parseInt(e.target.value),
+                      ])
+                    }
                     className="w-20"
                   />
                 )}
@@ -328,7 +347,10 @@ const PeBuyOrdersTable = (): React.ReactElement => {
             {!isAffiliate && (
               <div className="space-y-2">
                 <Label>Status</Label>
-                <Select onValueChange={setTempStatusFilter} value={tempStatusFilter}>
+                <Select
+                  onValueChange={setTempStatusFilter}
+                  value={tempStatusFilter}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
@@ -361,38 +383,34 @@ const PeBuyOrdersTable = (): React.ReactElement => {
         </SheetContent>
       </Sheet>
 
-      <div className="">
-        <div className=" absolute flex justify-end right-[280px]">
-          <CSVLink
-            data={orders}
-            filename={`OrderData_${moment().format(
-              'MMMM Do YYYY, h:mm:ss a'
-            )}.csv`}
-            headers={headers}
-          >
-            <Button variant="outline" disabled={data?.orders.length === 0} className={`${data?.orders.length === 0 ? '' : 'cursor-not-allowed'}`}>
-              Export to CSV
-            </Button>
-          </CSVLink>
-        </div>
+      <AccountTable
+        isSearchable={true}
+        columns={columns}
+        data={orders}
+        totalItems={totalItems}
+        itemsPerPage={limit}
+        currentPage={page}
+        onPageChange={(newPage, newLimit) => {
+          setPage(newPage)
+          if (newLimit) setLimit(newLimit)
+        }}
+        onSearch={handleSearch}
+        onFilter={handleFilter}
+        isLoading={isLoading}
+        onRowClick={handleRowClick}
+      />
 
-        <AccountTable
-          isSearchable={true}
-          columns={columns}
-          data={orders}
-          totalItems={totalItems}
-          itemsPerPage={limit}
-          currentPage={page}
-          onPageChange={(newPage, newLimit) => {
-            setPage(newPage)
-            if (newLimit) setLimit(newLimit)
-          }}
-          onSearch={handleSearch}
-          onFilter={handleFilter}
-          isLoading={isLoading}
-          onRowClick={handleRowClick}
+      {selectedOrder && (
+        <OrderDetails
+          isOpen={!!selectedOrder}
+          onClose={() => setSelectedOrder(undefined)}
+          order_id={selectedOrder}
+          setLoading={() => {}}
+          order={orders.find((order) => order.order_id === selectedOrder)}
+          dataUpdate={dataUpdate}
+          setDataUpdate={setDataUpdate}
         />
-      </div>
+      )}
     </>
   )
 }
